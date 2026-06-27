@@ -1,0 +1,77 @@
+\chapter{Introduction}
+
+%Este es el primer capítulo de la tesis. Se inicia con el desarrollo de la introducción de la tesis. Es importante que el texto utilice la tabla de abreviaturas correctamente. En el archivo abreviaturas.tex contiene la tabla de abreviaturas. Para citar alguna de ellas debes usar los comandos $\backslash$ac\{tu-sigla-aqui\}. Si es la primera vez que utilizas la sigla ella se expandirá por completo. Por ejemplo, el comando $\backslash$ac\{CMM\} va a producir: \ac{CMM}. Si más adelante repites el mismo comando sólo aparecerá la sigla \ac{CMM}. Para explorar mucho más este comando es necesario leer su manual disponible en: $http://www.ctan.org/tex-archive/macros/latex/contrib/acronym/$
+
+\section{Motivation}
+
+In Latin America, urbanization processes have been among the fastest worldwide in recent decades, generating profound transformations in the territory and in the lives of its inhabitants\footnote{UN-Habitat (2020). World Cities Report 2020: The Value of Sustainable Urbanization. \url{https://unhabitat.org/world-cities-report-2020-the-value-of-sustainable-urbanization}}. Lima Metropolitan Area constitutes an emblematic case: a city of more than ten million people whose growth has been marked by disorderly expansion, weak territorial planning, and constant pressure on transport, basic services, and environmental sustainability\footnote{Instituto Nacional de Estadística e Informática (INEI), Censo Nacional de Población 2017. \url{https://censo2017.inei.gob.pe/resultados-definitivos-de-los-censos-nacionales-2017/}}. Understanding how this urban growth occurs is essential. It is not enough to simply quantify that the city is expanding, it is also necessary to differentiate whether growth is occurring horizontally\footnote{Water-Sensitive Urban Plan for Lima Metropolitan Area (Peru) Based on Changes in the Urban Landscape from 1990 to 2021. doi: \url{https://doi.org/10.3390/land11122261}}—through the occupation of new land—or vertically\footnote{Confederación Nacional de Instituciones Empresariales Privadas (2013, December 13). Residential buildings in Lima gained two floors in height since 2011. CONFIEP. \url{https://www.confiep.org.pe/noticias/edificios-de-viviendas-en-lima-ganaron-dos-pisos-en-altura-desde-el-2011/}}—through densification and increases in building height \cite{Cheng2021DeepLab,Sirko2023TeachStudentSentinel2}. This distinction is critical to anticipate infrastructure demands, manage risks, and guide evidence-based public policy.
+
+The use of satellite imagery and semantic segmentation techniques has enabled the systematic monitoring of urban expansion. Previous studies on change detection in satellite images have been mainly addressed through supervised and semi-supervised learning approaches. Models such as ChangeFormer, SNUNet-CD, or BIT have achieved remarkable results on international benchmarks \cite{Bandara2022ChangeFormer,Fang2021SNUNetCD,Chen2022BIT}. Nevertheless, these approaches present some drawbacks: (1) they rely on large volumes of labeled data, the collection of which is costly and often unfeasible in Latin American cities, (2) they are typically optimized for specific contexts such as Europe or North America, which compromises their transferability, (3) they show a bias toward detecting horizontal changes, while being less effective at capturing processes of vertical densification.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{graficos/horizontal.png}
+        \caption{Urban Change: horizontal expansion.}
+        \label{fig:horizontal}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{graficos/vertical.png}
+        \caption{Confiep: vertical densification}
+        \label{fig:vertical}
+    \end{subfigure}
+    \caption{Urban growth in Lima.}
+    \label{fig:comparison_growth}
+\end{figure}
+
+On the other hand, the limited availability of labeled BCD datasets represents another major constraint for data-driven models. While benchmarks such as LEVIR-CD and DSIFN-CD have facilitated research progress \cite{Zheng2020LEVIR}, they do not reflect the heterogeneous morphologies and dense textures characteristic of Latin American cities. Moreover, they are composed of aerial imagery with resolutions between 0.3 m and 1 m per pixel—sufficient for global analysis but insufficient to evaluate fine-grained structural changes such as new floors or rooftop modifications.
+
+Urban analysis based on satellite imagery requires the precise identification of critical features of the built environment. This information is essential to construct reliable multitemporal maps that capture both horizontal and vertical urban  \cite{Cheng2021DeepLab}. Nevertheless, despite its importance, the task faces several challenges. First, municipal maps of Lima are often incomplete, and national censuses are too infrequent to reflect recent changes in urban morphology. Second, although open-access satellites such as Sentinel-2 or Landsat provide valuable coverage, their limited resolution prevents the detection of individual buildings \cite{Sirko2023TeachStudentSentinel2}. Third, even when very high-resolution (VHR) imagery such as that provided by PeruSAT-1 is available, the main obstacle remains the lack of reliable labels for training and validating deep learning models. Manual annotation of buildings across thousands of scenes is not feasible due to cost and time constraints, while collaborative data sources—such as OpenStreetMap—contain inconsistencies and significant noise, especially in peripheral areas.
+\newpage
+
+\begin{figure}[h!]
+    \centering
+    % ---- Subfigura (a) ----
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{graficos/VHR-sentinel2.png}
+        \caption{Resolution VHR vs Sentinel-2}
+    \end{subfigure}
+    \hspace{0.01\textwidth}
+    % ---- Subfigura (b) ----
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{graficos/PeruSAT1.png}
+        \caption{Resolution PeruSAT-1 (0.7 m/pixel).}
+    \end{subfigure}
+    \caption{Comparison of satellite images of different resolutions.}
+\end{figure}
+
+In this scenario, low rank attention techniques such as Rank-Augmented Linear Attention (RALA) have emerged as a promising alternative \cite{Fan2025RALA}. This modification on transformer block enable the training of robust visual representations from VHR datasets, thereby reducing the dependency on very high computational costs. Integrating this approach with very high-resolution (VHR) imagery from PeruSAT-1 opens the possibility of developing a system capable of mapping urban expansion and vertical densification in Lima Metropolitan Area across multiple temporal scales, even in the absence of high computing power.
+
+\section{Problem}
+
+Although Transformer-based architectures such as ChangeFormer have achieved state-of-the-art results in multi-temporal building change detection, their computational cost grows quadratically with image resolution and token length, making them impractical for large-scale processing of VHR imagery. This complexity is further exacerbated by the scarcity of annotated datasets and the high cost of manual labeling, especially in developing countries.
+
+In this research, we address both challenges by proposing the \textbf{RALA-ChangeFormer}, a computationally efficient model for multi-temporal building change detection. The architecture integrates the \textbf{Reduced-Rank Linear Attention (RALA)} \cite{Fan2025RALA} into the Transformer blocks of ChangeFormer~\cite{Bandara2022ChangeFormer}, reducing the computational and memory complexity from \(O(N^2)\) to \(O(N)\) while maintaining global contextual reasoning. This approach enables efficient training and inference on high-resolution imagery, thus extending the applicability of deep learning to resource-constrained environments.
+
+\section{Goals}
+
+The general objective of this work is to develop \textbf{RALA-ChangeFormer}, an efficient multi-temporal building change detection model that reduces the computational cost of Transformer-based networks while maintaining accuracy across standard benchmarks (LEVIR-CD, DSIFN-CD).
+
+\noindent \textbf{Specific goals.} The specific objectives of this research are the following. (a) We aim to design and implement an improved version of the ChangeFormer architecture that incorporates Reduced-rank Linear Attention in order to achieve efficient multi-temporal feature extraction, (b) we seek to preprocess and adapt very-high-resolution imagery for the building change detection task, ensuring compatibility with standard public datasets such as LEVIR-CD and DSIFN-CD, (c) we evaluate the performance of the proposed model against reference architectures, including ChangeFormer and BIT, using widely accepted metrics such as IoU, F1-score, precision, and recall, (d) we quantify the computational benefits introduced by the RALA mechanism through measurements of FLOPs, training time, and GPU memory consumption. Finally, (e) we assess the model’s transferability across different geographic regions and imaging conditions, highlighting its relevance for urban planning and environmental monitoring.
+
+\noindent \textbf{Outline.} 
+The remainder of this document is organized into five chapters. Chapter~\ref{chap:background} presents the theoretical background of building change detection, covering convolutional approaches, Transformer-based architectures, and the foundations of linear and low-rank attention mechanisms. Chapter~\ref{chap:related_work} reviews the most relevant literature in multi-temporal remote sensing, building footprint extraction, and change detection—with emphasis on ChangeFormer and its computational limitations. Chapter~\ref{chap:method} introduces the proposed RALA-ChangeFormer, detailing the mathematical formulation of Rank-Augmented Linear Attention and its integration into a bi-temporal encoder–decoder backbone. Chapter~\ref{chap:experiments} describes the experimental setup, datasets, evaluation metrics, implementation details, and provides a comprehensive analysis of quantitative, qualitative, and computational efficiency results. Finally, Chapter~\ref{chap:conclusiones} presents the main conclusions, discusses the problems encountered during this research, and outlines recommendations and future work for large-scale urban monitoring using very-high-resolution imagery.
+
+
+%\section{Method}
+
+%En esta sección se explica el modelo a desarrollar.
+
+%\section{Contribution}
+
+%El valor agregado de la tesis.

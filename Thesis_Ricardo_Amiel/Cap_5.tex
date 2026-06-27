@@ -1,0 +1,211 @@
+\chapter{Experiments and Results}
+\label{chap:experiments}
+
+This chapter presents the experimental evaluation of the proposed Rank-Augmented Linear Attention ChangeFormer (CF-RALA) for multi-temporal building change detection. The objective is to determine the extent to which reduced-rank linear attention can preserve or improve segmentation performance while reducing the computational burden associated with the original ChangeFormer architecture. The evaluation follows the standard ChangeFormer protocol on two widely used benchmarks: LEVIR-CD and DSIFN-CD. Additionally, this chapter analyzes computational efficiency in terms of training time, memory–batch size trade-offs, parameter count, and floating-point operations (FLOPs).
+
+Section~\ref{sec:exp_setup} details the experimental setup. 
+Section~\ref{sec:results} presents quantitative and qualitative results. 
+Section~\ref{sec:discussion} provides a broader interpretation of the findings, and 
+Section~\ref{sec:final_considerations} summarizes the main conclusions.
+
+\section{Experimental setup}
+\label{sec:exp_setup}
+
+\paragraph{LEVIR-CD.}
+LEVIR-CD contains 637 pairs of VHR RGB aerial images of size $1024 \times 1024$, each with corresponding binary building-change masks. Following the ChangeFormer protocol, the images are divided into non-overlapping $256 \times 256$ patches, yielding 6096 training, 762 validation, and 762 testing samples. As building-change pixels represent a small fraction of the total area, metrics such as F1-score and IoU are relevant for evaluation.
+
+\paragraph{DSIFN-CD.}
+DSIFN-CD contains $512 \times 512$ multisource remote sensing image pairs presenting heterogeneous changes in buildings, vegetation, and man-made structures. Following previous work, patches of $256 \times 256$ are generated, resulting in 14400 training samples, 1360 validation samples, and 192 testing samples. The dataset is more diverse than LEVIR-CD, making it suitable for evaluating generalization.
+
+\noindent \textbf{Compared methods.} The baseline is ChangeFormer-256, a Siamese Transformer encoder paired with an MLP decoder. The proposed CF-RALA-256 replaces the self-attention inside the encoder with Rank-Augmented Linear Attention (RALA), leaving the remaining architecture unchanged. This ensures that differences in performance stem solely from the attention mechanism. To analyze scalability, additional variants using different resolutions and batch sizes were tested. Configurations are denoted as CF-256-X and CF-512-X for baselines, and Ours-256-X and Ours-512-X for RALA versions, where X indicates batch size.
+
+\noindent \textbf{Implementation details.} All models were implemented in PyTorch and trained on a single NVIDIA A100 GPU (40 GB). Training hyperparameters follow those of ChangeFormer: AdamW optimizer, learning rate $10^{-4}$ with linear decay, and combined Binary Cross-Entropy and Dice loss. A patch size of $256 \times 256$ and batch size 16 were used for the main experiments. Variants with larger resolutions ($512^2$ and $1024^2$) or larger batch sizes were trained when feasible within the VRAM budget.
+
+\noindent \textbf{Evaluation metrics.} The evaluation considers Precision, Recall, F1-score, Intersection over Union (IoU), and Overall Accuracy (OA). For computational efficiency, parameter count, FLOPs, and training time per epoch were recorded.
+
+\section{Quantitative results}
+\label{sec:results}
+
+\subsection{Main results on LEVIR-CD}
+
+\begin{table}[h!]
+\centering
+\small
+\caption{Results on LEVIR-CD using $256 \times 256$ patches. Values in percentage.}
+\label{tab:levir_results}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{IoU} & \textbf{OA} \\
+\hline
+CF-RALA-256       & 91.99 & 87.84 & 89.87 & 81.60 & 98.99 \\
+CF-256 (baseline) & 92.06 & 88.80 & 90.40 & 82.48 & 99.04 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+LEVIR-CD is a clean dataset characterized by strong geometric structures such as rectangular buildings, uniform rooftops, and well-aligned urban patterns. These properties benefit models with global receptive fields. CF-RALA-256 achieves an F1-score of 89.87\% and an IoU of 81.60\%, nearly identical to the baseline's 90.40\% and 82.48\%, respectively. This is a meaningful observation: replacing quadratic self-attention with reduced-rank linear attention does not compromise the model’s capacity to represent structural dependencies across the pre- and post-change images. Building footprints in LEVIR-CD are typically large and visually salient, making the reduced-rank approximation sufficiently expressive. Furthermore, the relatively low presence of noise, illumination variability, and sensor artifacts reduces the need for fine-grained pixel interactions, which could otherwise favor the baseline.
+
+Thus, the results indicate that the key inductive biases of ChangeFormer global contextual integration and hierarchical encoding—remain intact after introducing linear attention.
+
+\subsection{Main results on DSIFN-CD}
+
+\begin{table}[h!]
+\centering
+\small
+\caption{Results on DSIFN-CD using $256 \times 256$ patches. Values in percentage.}
+\label{tab:dsifn_results}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{IoU} & \textbf{OA} \\
+\hline
+CF-RALA-256       & 88.02 & 77.22 & 86.07 & 68.96 & 89.44 \\
+CF-256 (baseline) & 88.48 & 84.94 & 86.67 & 76.48 & 95.56 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+DSIFN-CD presents a much more heterogeneous setting. Differences arise not only from building construction or demolition but also from vegetation growth, seasonal changes, soil exposure, water movement, and illumination conditions. These factors create noisy boundaries and subtle transitions that are difficult to model. Under this scenario, CF-RALA-256 maintains a competitive F1-score but exhibits anotable drop in IoU compared to the baseline. IoU is particularly sensitive boundary mismatches, and thin or irregular changes—common in DSIFN-CD—benefit fromthe full quadratic attention of the baseline. The ability of standard self-attention to model token-level interactions at long range allows it to refine irregular edges slightly better.
+
+Even so, the precision and recall of CF-RALA-256 remain solid. This suggests that the model successfully captures the majority of real changes but occasionally underfits fine-grained boundaries when the underlying visual cues are weak or noisy. The gap in IoU thus reflects the dataset complexity more than a fundamental limitation of linear attention.
+
+\subsection{Training time analysis}
+
+Training-time comparisons reveal that CF-RALA achieves efficiency gains without sacrificing accuracy. On LEVIR-CD, using identical hyperparameters, CF-256 completes training in approximately 22 hours, while CF-RALA-256 finishes in around 21 hours. On DSIFN-CD, the baseline requires 20 hours, whereas CF-RALA-256 completes in 18 hours.
+
+Although the reductions may appear modest, they follow the expected trend: since quadratic attention dominates computational cost at higher resolutions, savings become more noticeable as sequences grow. At $256 \times 256$, GPU throughput and I/O subsystems partially mask the theoretical advantage; however, the benefit becomes more substantial when exploring larger resolutions, as shown below.
+
+\subsection{Scaling with resolution and batch size}
+
+Scaling experiments highlight the practical strengths of linear attention in remote sensing applications. As resolution and batch size increase, quadratic attention quickly becomes the primary memory bottleneck.
+
+\begin{table}[h!]
+\centering
+\small
+\caption{Computational efficiency across resolutions and batch sizes.}
+\label{tab:efficiency}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Res.} & \textbf{Batch} & \textbf{Time/epoch} & \textbf{Params (M)} & \textbf{FLOPs (G)} & \textbf{Dataset} \\
+\hline
+CF-256-16-D      & 256$^2$ & 16 & 6.0 min   & 247 & 138.77 & DSIFN \\
+Ours-256-16-D    & 256$^2$ & 16 & 6.0 min   & 243 & 138.62 & DSIFN \\
+Ours-512-8-D     & 512$^2$ &  8 & <7 min    & 243 & 554.47 & DSIFN \\
+CF-512-8-D       & 512$^2$ &  8 & 7.0 min   & 247 & 560.05 & DSIFN \\
+CF-1024-2-L      & 1024$^2$ &  2 & 4.5 h     & 247 & 2319.10 & LEVIR \\
+Ours-256-32-L    & 256$^2$ & 32 & 16.5 min  & 243 & ---     & LEVIR \\
+\hline
+\end{tabular}
+\end{table}
+
+
+At $512 \times 512$, CF-RALA matches baseline accuracy while achieving a slight reduction in FLOPs and fitting comfortably with a batch size of 8. This is important because DSIFN-CD benefits significantly from higher resolution: many of its changes are small-scale and texture-dependent.
+
+At $1024 \times 1024$, the baseline becomes memory-limited and can only train with batch size 2 on a partitioned A100 40 GB GPU. CF-RALA also reaches the memory limit at this scale when attempting larger batches. Running stable training at this resolution would likely require an unpartitioned A100 80~GB GPU or gradient accumulation.
+
+Meanwhile, increasing batch size proves highly effective for LEVIR-CD. Because its changes are structured and spatially consistent, larger batches provide smoother gradient estimates and improve convergence stability. CF-RALA supports batch sizes up to 32 at $256 \times 256$ resolution, significantly expanding the feasible training space under realistic hardware limitations.
+
+These behaviors suggest two complementary training strategies: larger batch sizes for datasets dominated by clear structural changes (LEVIR-CD) and larger spatial resolutions for datasets with fine-grained or noisy variations (DSIFN-CD). CF-RALA enables both strategies more comfortably than the baseline.
+
+\section{Qualitative results}
+
+Qualitative results further support the quantitative observations. On LEVIR-CD, CF-RALA-256 produces crisp building-change masks with minimal false positives. Its predictions closely match the structural geometry of new constructions or demolitions. On DSIFN-CD, the model demonstrates strong localization of major changes but occasionally over-segments or under-segments thin features or highly textured vegetation areas—patterns consistent with its IoU behavior.
+
+\begin{figure}[htp]
+    \centering
+    % ---------------------------------------------
+    % LEVIR-CD: Row 1
+    % ---------------------------------------------
+    \begin{tabular}{ccc}
+        \includegraphics[width=0.25\textwidth]{graficos/GT_test_1.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/SOTA_test_1.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/RALA_test_1.png} \\
+        (a) Ground Truth & (b) ChangeFormer & (c) CF-RALA (ours) \\
+    \end{tabular}
+
+    \vspace{0.25cm}
+
+    % ---------------------------------------------
+    % LEVIR-CD: Row 2
+    % ---------------------------------------------
+    \begin{tabular}{ccc}
+        \includegraphics[width=0.25\textwidth]{graficos/GT_test_5.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/SOTA_test_5.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/RALA_test_5.png} \\
+        (d) Ground Truth & (e) ChangeFormer & (f) CF-RALA \\
+    \end{tabular}
+
+    \caption{Qualitative comparison on \textbf{LEVIR-CD}. 
+    Each triplet shows Ground Truth, ChangeFormer (baseline), and CF-RALA (ours). 
+    Examples include typical building additions, multi-building changes, and 
+    structured urban layouts. CF-RALA produces masks comparable to or cleaner 
+    than the baseline, particularly in homogeneous background regions.}
+    \label{fig:levir_qualitative}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    
+    % ---------------------------------------------
+    % DSIFN-CD: Row 1
+    % ---------------------------------------------
+    \begin{tabular}{ccc}
+        \includegraphics[width=0.25\textwidth]{graficos/GT_14_2.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/SOTA_14_2.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/RALA_14_2.png} \\
+        (a) Ground Truth & (b) ChangeFormer & (c) CF-RALA (ours) \\
+    \end{tabular}
+
+    \vspace{0.25cm}
+
+    % ---------------------------------------------
+    % DSIFN-CD: Row 2
+    % ---------------------------------------------
+    \begin{tabular}{ccc}
+        \includegraphics[width=0.25\textwidth]{graficos/GT_0_4.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/SOTA_0_4.png} &
+        \includegraphics[width=0.25\textwidth]{graficos/RALA_0_4.png} \\
+        (d) Ground Truth & (e) ChangeFormer & (f) CF-RALA \\
+    \end{tabular}
+
+    \caption{Qualitative comparison on \textbf{DSIFN-CD}. 
+    Scenes are more heterogeneous compared to LEVIR-CD, including vegetation, 
+    soil, and mixed land-cover transitions. CF-RALA retains most structural 
+    changes while occasionally producing less precise boundaries due to 
+    fine-scale ambiguity typical of DSIFN-CD.}
+    \label{fig:dsifn_qualitative}
+\end{figure}
+
+\newpage
+
+\section{Discussion}
+\label{sec:discussion}
+
+The results obtained in this chapter provide several insights into the role of attention mechanisms in Transformer-based change detection, as well as the specific strengths and limitations of the proposed CF-RALA model.
+
+A first observation is that reduced-rank linear attention preserves the core predictive capabilities of ChangeFormer on LEVIR-CD. This dataset contains structured, high-contrast building changes, where rooftops exhibit consistent geometry and well-defined edges. Under these conditions, global contextual reasoning is more important than fine-grained pixel-level interactions. RALA’s linear mechanism captures long-range dependencies efficiently, even in reduced-rank form, which explains the negligible drop in F1 and IoU.
+
+A second observation emerges from the DSIFN-CD experiments. This dataset mixes building changes with appearance variations caused by vegetation phenology, soil moisture, shadowing, and diverse land-cover transitions. These factors introduce irregular and thin structures that benefit from the higher representational capacity of quadratic self-attention. Consequently, CF-RALA exhibits a small but consistent drop in IoU relative to the baseline. This degradation indicates that linear attention, despite capturing broad semantic patterns, may have lower sensitivity to subtle spatial edges, especially when textures are noisy or multi-scale.
+
+However, the recall and F1 remain highly competitive, suggesting that RALA is able to successfully isolate the majority of meaningful changes while occasionally missing minor boundary refinements. The model is therefore robust in identifying the presence of change, but its segmentation precision can be slightly affected in heterogeneous regions.
+
+A third insight is related to computational scalability. The experiments confirm that quadratic attention becomes a major bottleneck as resolution increases. Already at $512 \times 512$, the baseline reaches VRAM limitations at batch size 8, while RALA runs comfortably with the same or larger batches. At $1024 \times 1024$, the baseline barely fits with batch size 2 on a partitioned A100. In contrast, CF-RALA shows significantly improved memory behavior, although the resolution still challenges the 40~GB VRAM limit. This scaling behavior is particularly relevant for future work with VHR sensors (e.g., PeruSAT-1, WorldView), where native patches often exceed 512 pixels per side.
+
+Fourth, qualitative inspection reveals that linear attention tends to generate cleaner masks with fewer false positives in homogeneous backgrounds. This suggests that RALA implicitly regularizes the attention maps by focusing on dominant low-rank structures. While this can occasionally reduce sensitivity to micro-structures, it helps filter out artifacts caused by sensor noise or terrain texture.
+
+Finally, the results highlight an important strategic trade-off for remote sensing: datasets dominated by regular man-made structures (LEVIR-CD, WHU-CD, certain urban regions of PeruSAT-1) benefit from efficiency-focused architectures like CF-RALA, whereas highly heterogeneous datasets (DSIFN-CD, mixed land-cover monitoring) still benefit from full-rank attention. The choice of attention mechanism should therefore be dataset-driven, balancing memory constraints, target resolution, and the need for boundary-level precision.
+
+
+\section{Final considerations}
+\label{sec:final_considerations}
+
+The experimental results validate the central hypothesis of this thesis: it is possible to replace quadratic self-attention with a reduced-rank linear mechanism while preserving competitive change-detection performance. On LEVIR-CD, CF-RALA achieves near-identical metrics to the baseline ChangeFormer-256 across all evaluation criteria, demonstrating that architectural expressiveness is not compromised by low-rank approximation in structured urban scenarios.
+
+On DSIFN-CD, which presents complex and heterogeneous changes, the proposed model remains competitive in terms of F1-score and recall, although with a moderate drop in IoU. This behavior is aligned with the intrinsic characteristics of the dataset and the reduced sensitivity of linear attention to fine boundary irregularities. Nevertheless, the model continues to provide reliable localization of major structural changes.
+
+From a computational standpoint, CF-RALA provides substantial benefits. It reduces FLOPs relative to the baseline, supports significantly larger batch sizes, and scales better with spatial resolution under the same VRAM budget. These advantages directly impact real-world applicability, enabling experimentation with larger image patches, faster convergence, and more robust training dynamics—factors that are essential when moving to satellite missions such as PeruSAT-1, where very-high-resolution data imposes substantial computational demands.
+
+The qualitative results further support these conclusions. CF-RALA generates cleaner building-change masks in structured environments, with fewer false positives in uniform backgrounds. The qualitative comparisons also illustrate how the method generalizes to multi-building patterns and complex urban configurations.
+
+In summary, the performance–efficiency balance achieved by CF-RALA makes it a promising candidate for large-scale urban monitoring, especially in resource-constrained settings. This work demonstrates that linear attention can effectively support high-resolution change detection and opens several avenues for future research, including integration with self-supervised pretraining, multimodal fusion (DSM, SAR), or end-to-end pipelines for operational monitoring of cities like Lima.

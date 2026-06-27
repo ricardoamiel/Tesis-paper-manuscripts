@@ -1,0 +1,14 @@
+\begin{abstract}
+This thesis proposes CF-RALA, an efficient Transformer-based architecture for
+multi-temporal building change detection in very-high-resolution remote sensing
+imagery. The model introduces Rank-Augmented Linear Attention (RALA) to replace
+the quadratic self-attention used in ChangeFormer, aiming to reduce memory and
+computational cost while preserving segmentation accuracy. Experiments conducted
+on the LEVIR-CD and DSIFN-CD benchmarks show that CF-RALA achieves performance
+comparable to the baseline on structured urban scenes, while remaining competitive
+on heterogeneous environments with a moderate reduction in IoU. Furthermore,
+CF-RALA enables larger batch sizes and higher input resolutions within a 40~GB GPU
+budget, improving scalability for operational settings. These findings demonstrate
+that low-rank linear attention is a viable alternative for high-resolution change
+detection and provide a foundation for future applications using PeruSAT-1 imagery.
+\end{abstract}

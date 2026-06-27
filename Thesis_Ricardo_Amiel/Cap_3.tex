@@ -1,0 +1,180 @@
+\chapter{Related Work}
+\label{chap:related_work}
+
+\noindent
+Building Change Detection (BCD) from very-high-resolution (VHR) satellite imagery has emerged as a central topic within remote sensing and computer vision, with applications ranging from urban expansion monitoring to disaster assessment and infrastructure management. The primary objective of BCD is to identify when and where built structures appear, disappear, or undergo modifications between two or more acquisition periods. Traditionally, this task is framed as a bi-temporal semantic segmentation problem that produces a binary mask delineating the areas of change at building level. The effectiveness of such models is critical for decision-making in urban planning and sustainable development contexts.
+
+\medskip
+\noindent
+In Latin American cities, where urbanization is highly dynamic and heterogeneous, several challenges arise: variations in rooftop materials, dense informal settlements, shadows, cloud occlusion, and frequent misalignments between temporal acquisitions. Moreover, the scarcity of accurate annotated datasets makes the task considerably more complex. Although standard benchmarks such as LEVIR-CD, WHU-CD and DSIFN-CD \cite{Zheng2020LEVIR} have stimulated advances in model design and evaluation, their geographical distribution and annotation protocols often differ from local conditions—such as those in Lima—limiting their direct transferability.
+
+\medskip
+\noindent
+In the last decade, deep learning has driven a paradigm shift in change detection, enabling automated extraction of temporal patterns from multi-temporal satellite images. The literature reveals three predominant learning strategies: supervised, semi-supervised, and self-/unsupervised learning. Each paradigm has contributed to significant progress while exposing key limitations in scalability, data dependency, and robustness. Supervised learning remains the most widely adopted due to its accuracy and interpretability, but it requires large amounts of precisely labeled data and accurate co-registration between image pairs—conditions rarely satisfied in real-world settings.
+
+\medskip
+\noindent
+Conversely, self-supervised and semi-supervised frameworks have emerged to address the limitations of fully supervised pipelines. These methods aim to reduce annotation cost by learning transferable visual representations from unlabeled data, either by enforcing feature consistency or leveraging contrastive pretraining strategies. Recent unsupervised formulations even attempt to infer changes through representation differences without requiring any explicit labels, inspired by advances in foundation models and attention mechanisms.
+
+\medskip
+\noindent
+The following sections review the most influential methods within these paradigms. Section~\ref{sec:supervised-bcd} presents supervised bi-temporal networks—ranging from convolutional Siamese architectures such as HFA-Net \cite{Zheng2022HFANet} to Transformer-based approaches like ChangeFormer \cite{Bandara2022ChangeFormer}, BIT \cite{Chen2022BIT}, and Swin Transformer CD \cite{Teng2023SwinCD}. Section~\ref{sec:ssl-semi-unsup} examines semi- and self-supervised strategies, including FCCDN \cite{PChen2022FCCDN}, SSLChange \cite{Zhao2024SSLChange}, and Advancing SSL for BCD \cite{Yang2025SSLBuilding}, as well as unsupervised alternatives such as SCM \cite{Zhao2023SCM}. Finally, Section~\ref{sec:enablers-transformers} highlights foundational architectures—Vision Transformers (ViT) \cite{Dosovitskiy2021ViT}, attention mechanisms \cite{Vaswani2017Attention}, and linear/efficient variants like RALA \cite{Fan2025RALA}—alongside self-supervised pretraining frameworks \cite{He2022MAE,Caron2023DINOv3,Kirillov2023SAM} and lightweight attention modules such as SA-Net \cite{Zhang2021SANet}. Together, these developments form the conceptual basis for the proposed RALA-enhanced Siamese Transformer architecture presented in this thesis.
+
+
+\section{Supervised Bi-Temporal Building Change Detection}
+\label{sec:supervised-bcd}
+
+\noindent
+Supervised approaches dominate the field of building change detection (BCD) because they leverage labeled bi-temporal image pairs to learn direct mappings between appearance differences and semantic changes. These methods typically formulate BCD as a pixel-wise classification problem, where the network is trained using annotated examples of \emph{changed} and \emph{unchanged} regions. Early deep learning pipelines relied on fully convolutional networks (FCN) or encoder–decoder backbones inspired by segmentation architectures such as U-Net, often adapted to handle two-stream inputs representing pre- and post-event images. This paradigm rapidly evolved into Siamese or pseudo-Siamese frameworks designed to extract comparable feature embeddings for each temporal input before performing fusion or differencing in latent space \cite{Zheng2022HFANet,Chen2022BIT,Teng2023SwinCD}.
+
+\medskip
+\noindent
+Within the CNN family, various designs explored spatial feature alignment and edge preservation. Multi-scale fusion and attention refinement modules—such as those in HFA-Net—enhance boundary localization and suppress noise in unchanged areas. Feature-constraint or context-guided designs further incorporate residual and pyramid attention mechanisms to improve robustness under complex urban textures. Despite these refinements, purely convolutional models exhibit limited receptive fields and struggle to capture long-range dependencies, motivating the transition toward Transformer-based backbones.
+
+\medskip
+\noindent
+Transformer architectures have recently demonstrated superior representational capacity for BCD. Networks integrate multi-head self-attention to model global spatial–temporal relationships between the two epochs \cite{Bandara2022ChangeFormer,Chen2022BIT}\newline\cite{Teng2023SwinCD}. These models typically employ hierarchical feature fusion and cross-attention blocks that align contextual cues from both timestamps, achieving state-of-the-art performance on LEVIR-CD and WHU-CD. However, their gains in accuracy come at the cost of computational overhead and dependence on extensive labeled datasets, highlighting an inherent trade-off between generalization and annotation cost.
+
+\medskip
+\noindent
+To mitigate label scarcity, some studies exploit semi-supervised regularization within supervised pipelines, enforcing feature consistency or pseudo-label propagation technique \cite{PChen2022FCCDN}. While these techniques partially relax data requirements, they remain grounded in the supervised paradigm, depending on high-quality reference masks for stable training. Furthermore, supervised methods are sensitive to spatial misregistration and illumination differences between image pairs, often necessitating heavy pre-processing or data augmentation to maintain robustness.
+
+\medskip
+\noindent
+In summary, supervised BCD models have achieved remarkable progress in accuracy and architectural sophistication, yet their dependence on large, cleanly annotated datasets and their limited scalability across geographic domains motivate the exploration of self- and semi-supervised alternatives discussed in Section~\ref{sec:ssl-semi-unsup}.
+
+\begin{table}[H]
+\small
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{3pt}
+\caption{Summary of supervised learning methods for building change detection. Adapted from \cite{Chen2022BIT, Zheng2022HFANet, Bandara2022ChangeFormer, Teng2023SwinCD}.}
+\vspace{4pt}
+\noindent\hspace*{\parindent}%
+\begin{minipage}{\dimexpr\textwidth-\parindent\relax}
+\begin{tabularx}{\linewidth}{|p{2.2cm}|p{0.8cm}|p{2.5cm}|p{2.5cm}|X|}
+\hline
+\textbf{Publication} & \textbf{Year} & \textbf{Method} & \textbf{Datasets} & \textbf{Limitations} \\ \hline
+Chen et al. & 2020 & Siamese CNN + RNN & Wuhan, Hanyang & Sensitive to misalignment; computationally heavy. \\ \hline
+Zheng et al. & 2022 & HFA-Net & LEVIR-CD, WHU & Sensitive to noise; requires precise registration. \\ \hline
+Teng et al. & 2023 & Swin Transformer CD & LEVIR-CD, WHU-CD & High GPU demand; complex fine-tuning. \\ \hline
+Chen et al. & 2021 & BIT (Transformer) & LEVIR-CD & High computational cost; limited scalability. \\ \hline
+Bandara et al. & 2022 & ChangeFormer & LEVIR-CD, WHU-CD & Time-consuming training; high parameter count. \\ \hline
+\end{tabularx}
+\end{minipage}
+\end{table}
+
+
+
+\newpage
+
+\section{Self-, Semi-, and Unsupervised Learning for Building Change Detection}
+\label{sec:ssl-semi-unsup}
+
+\noindent
+Although supervised methods achieve high accuracy, their dependence on extensive labeled datasets limits scalability, particularly in domains where annotation is costly and error-prone. To overcome this bottleneck, recent research has increasingly explored self-supervised, semi-supervised, and fully unsupervised strategies that exploit unlabeled or weakly labeled multi-temporal data. These paradigms aim to learn transferable feature representations or temporal consistency constraints without requiring pixel-level supervision.
+
+\medskip
+\noindent
+\textbf{Semi-supervised learning (Semi-SL).}  
+Semi-supervised BCD methods combine limited ground-truth annotations with unlabeled samples, encouraging feature consistency between epochs. Representative work such as FCCDN introduces dual-branch encoders with feature-constraint losses to align predictions across domains and pseudo-labeled regions \cite{PChen2022FCCDN}. Other studies adopt mean-teacher or consistency regularization strategies to stabilize predictions under geometric and radiometric perturbations. Although these methods reduce annotation effort, their reliance on partial labels and sensitive hyper-parameter tuning often leads to instability when domain shifts occur.
+
+\medskip
+\noindent
+\textbf{Self-supervised learning (SSL).}  
+SSL approaches pretrain the network on auxiliary objectives that do not require labels, such as contrastive, denoising, or reconstruction tasks, and then fine-tune on BCD datasets. Contrastive SSL frameworks—including SSLChange and Advancing SSL for BCD—learn temporal invariances by pulling together representations of unchanged regions while pushing apart those of changed areas \cite{Zhao2024SSLChange,Yang2025SSLBuilding}. These approaches frequently employ dual encoders with shared weights and momentum updates, inspired by MoCo and SimCLR pipelines. Beyond contrastive paradigms, denoising autoencoder pretraining or masked-image modeling has also proven effective in capturing multi-temporal context. Such representations substantially improve generalization under label scarcity, though they still require fine-tuning on specific datasets like LEVIR-CD or WHU-CD to reach SOTA performance.
+
+\medskip
+\noindent
+\textbf{Unsupervised learning.}  
+Fully unsupervised pipelines eliminate labeled data entirely by leveraging clustering, feature differencing, or foundation-model priors. Recent work such as the Segment Change Model (SCM) demonstrates that pretrained segmenters like SAM can act as zero-shot detectors when coupled with semantic attention modules \cite{Zhao2023SCM,Kirillov2023SAM}. Other studies exploit self-distillation frameworks like DINOv3 or masked autoencoders (MAE) to learn building-specific representations directly from unlabeled satellite collections \cite{Caron2023DINOv3,He2022MAE}. These models achieve competitive performance in binary change detection while offering strong domain transferability, albeit with reduced edge precision and sensitivity to misregistration artifacts.
+
+\medskip
+\noindent
+Overall, self- and semi-supervised learning represent an emerging frontier for BCD. By leveraging unlabeled temporal imagery, they enable representation learning at continental scale and mitigate the dependence on costly human annotations. Nevertheless, achieving fine-grained localization comparable to supervised baselines remains challenging, motivating the exploration of hybrid designs that combine efficient attention mechanisms (e.g., RALA \cite{Fan2025RALA}) with self-supervised pretraining—a direction further discussed in Section~\ref{sec:enablers-transformers}.
+
+\begin{table}[H]
+\small
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{3pt}
+\caption{Semi- and self-supervised learning approaches for building change detection. Adapted from \cite{PChen2022FCCDN, Zhao2024SSLChange, Yang2025SSLBuilding, Wang2023DualDecoder}.}
+\vspace{4pt}
+\noindent\hspace*{\parindent}%
+\begin{minipage}{\dimexpr\textwidth-\parindent\relax}
+\begin{tabularx}{\linewidth}{|p{2.5cm}|p{0.8cm}|p{2.8cm}|p{2.8cm}|X|}
+\hline
+\textbf{Publication} & \textbf{Year} & \textbf{Method} & \textbf{Datasets} & \textbf{Limitations} \\ \hline
+Chen et al. & 2021 & FCCDN & LEVIR-CD, WHU-CD & Training instability; dependence on partial labels. \\ \hline
+Wang et al. & 2023 & Dual Encoder–Decoder & LEVIR-CD, WHU-CD & Complex optimization; prone to overfitting. \\ \hline
+Li et al. & 2024 & SSLChange & LEVIR-CD, CDD & Requires fine-tuning for stability; limited generalization. \\ \hline
+Yang et al. & 2025 & Advancing SSL for BCD & LEVIR, WHU, xBD & High computational cost; dual-decoder overhead. \\ \hline
+\end{tabularx}
+\end{minipage}
+\end{table}
+
+
+
+
+
+\section{Transformer-Based and Efficiency-Oriented Architectures}
+\label{sec:enablers-transformers}
+
+\noindent
+The introduction of attention mechanisms and Vision Transformers (ViTs) has redefined representation learning in remote sensing and change detection. Unlike convolutional networks that model local receptive fields, Transformers capture long-range dependencies by computing pairwise relationships among all tokens, enabling a global understanding of spatial–temporal context. The seminal work \textit{Attention is All You Need} established self-attention as a universal sequence modeling tool \cite{Vaswani2017Attention}, later adapted to vision tasks through the Vision Transformer (ViT) framework \cite{Dosovitskiy2021ViT}. ViT divides an image into patches and processes them as tokens, providing a scalable and interpretable alternative to convolutional hierarchies. Subsequent analyses demonstrated that ViTs outperform convolutional models when trained on large datasets, with better generalization and robustness to distribution shifts \cite{Raghu2023RevengeViT}.
+
+\medskip
+\noindent
+\textbf{Resolution and scalability advances.}  
+Although ViT offered global attention, its fixed patch size limited adaptability across variable image resolutions. ViTAR extended this design by introducing resolution-agnostic embeddings, allowing the model to handle heterogeneous inputs such as varying ground sampling distances or image sizes without retraining \cite{Fan2024ViTAR}. This property is particularly relevant for urban-scale satellite mosaics, where tile dimensions fluctuate across sensors and acquisition conditions. Furthermore, hierarchical Transformers such as Swin CD inherit local windowed attention to improve computational efficiency, bridging the gap between convolutional inductive biases and Transformer flexibility.
+
+\medskip
+\noindent
+\textbf{Lightweight and efficient attention mechanisms.}  
+Full self-attention scales quadratically with token count, making it impractical for high-resolution imagery. Several works have proposed efficient approximations to reduce memory and runtime. Among them, the Recurrent Approximation Linear Attention (RALA) mechanism reformulates self-attention as a recurrent operation with linear complexity $\mathcal{O}(n)$, substantially lowering computational cost while maintaining representational expressiveness \cite{Fan2025RALA}. Complementary modules like SA-Net introduce shuffle-based channel–spatial attention to preserve local detail in lightweight CNN–Transformer hybrids \cite{Zhang2021SANet}. Together, these innovations enable the design of compact models that can scale to large regional datasets without sacrificing fine-grained precision.
+
+\noindent
+\textbf{Foundation models and self-supervised pretraining.}  
+Beyond architecture, recent breakthroughs in self-supervised and foundation models have provided powerful initialization schemes for remote sensing applications. Methods such as Masked Autoencoders (MAE) and DINOv3 train Transformers to reconstruct or distill latent representations from unlabeled imagery, achieving transferable embeddings across diverse visual domains \cite{He2022MAE,Caron2023DINOv3}. Similarly, the Segment Anything Model (SAM) introduced prompt-based segmentation capable of zero-shot generalization to unseen objects, leveraging a billion-scale dataset (SA-1B) \cite{Kirillov2023SAM}. These approaches significantly reduce the need for annotated data and have inspired hybrid models—such as SCM—that adapt foundation backbones to building change detection through domain-specific fine-tuning.
+
+\noindent
+\textbf{Integration in BCD pipelines.}  
+The combination of efficient attention, foundation pretraining, and task-specific Siamese architectures is shaping the next generation of BCD models. Transformers pretrained on self-supervised objectives can serve as universal encoders, while linear or shuffle-based attention reduces computational barriers for operational deployment. This synergy between representational capacity and efficiency forms the basis for our proposed \textbf{RALA-enhanced Siamese Transformer}, which integrates recurrent linear attention with self-supervised pretraining to achieve robust and scalable change detection under limited supervision.
+
+\begin{table}[H]
+\small
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{3pt}
+\caption{Semi- and self-supervised learning approaches for building change detection. Adapted from \cite{PChen2022FCCDN, Zhao2024SSLChange, Yang2025SSLBuilding, Wang2023DualDecoder}.}
+\vspace{4pt}
+\noindent\hspace*{\parindent}%
+\begin{minipage}{\dimexpr\textwidth-\parindent\relax}
+\begin{tabularx}{\linewidth}{|p{2.5cm}|p{0.8cm}|p{2.8cm}|p{2.8cm}|X|}
+\hline
+\textbf{Publication} & \textbf{Year} & \textbf{Method} & \textbf{Datasets} & \textbf{Limitations} \\ \hline
+Chen et al. & 2021 & FCCDN & LEVIR-CD, WHU-CD & Training instability; dependence on partial labels. \\ \hline
+Wang et al. & 2023 & Dual Encoder–Decoder & LEVIR-CD, WHU-CD & Complex optimization; prone to overfitting. \\ \hline
+Li et al. & 2024 & SSLChange & LEVIR-CD, CDD & Requires fine-tuning for stability; limited generalization. \\ \hline
+Yang et al. & 2025 & Advancing SSL for BCD & LEVIR, WHU, xBD & High computational cost; dual-decoder overhead. \\ \hline
+\end{tabularx}
+\end{minipage}
+\end{table}
+
+
+
+
+\section{Final Considerations}
+\label{sec:related-final}
+
+\noindent
+This chapter reviewed the main methodological paradigms and architectural advances that have shaped the evolution of building change detection (BCD) from very-high-resolution satellite imagery. The analysis covered supervised, semi-supervised, and self-/unsupervised learning strategies, alongside the foundational attention-based architectures that underpin recent progress. Each category reflects a balance between accuracy, data efficiency, and computational feasibility, defining the trade-offs that guide the design of modern BCD systems.
+
+\noindent
+Supervised learning approaches, particularly convolutional and Transformer-based Siamese networks, remain the dominant paradigm due to their high accuracy and interpretability. However, their reliance on dense and high-quality annotations, sensitivity to spatial misalignment, and computational demands limit their scalability in operational or data-scarce environments. Semi-supervised extensions partially address this issue through consistency constraints and pseudo-labeling but still depend on labeled reference masks to stabilize training.
+
+\noindent
+In contrast, self-supervised and unsupervised learning frameworks offer promising avenues for label-efficient change detection. By leveraging contrastive, reconstruction, or distillation objectives, these methods enable models to learn generalizable temporal representations from unlabeled data. Nevertheless, their performance gap relative to fully supervised baselines, particularly in edge delineation and false-positive control, remains a persistent challenge. Bridging this gap requires combining strong feature priors from large-scale pretraining with lightweight architectures capable of maintaining spatial precision.
+
+\noindent
+The advent of Vision Transformers, efficient attention mechanisms such as RALA, and foundation models like SAM and DINOv3 has transformed this landscape. These architectures provide transferable inductive biases and scalable mechanisms for global context modeling. Integrating these advances within Siamese frameworks can substantially improve both representational power and training efficiency. In this sense, the current frontier in BCD research lies in designing hybrid models that jointly exploit self-supervised pretraining, efficient attention, and domain adaptation to achieve high accuracy under minimal supervision.
+
+\noindent
+The insights gathered from this review motivate the design of the proposed \textbf{RALA-enhanced, self-supervised Siamese Transformer}, which unifies these trends into a single framework. By embedding recurrent linear attention within a contrastive self-supervised training scheme, this architecture aims to deliver robust, scalable, and label-efficient change detection tailored to heterogeneous urban environments such as Lima.
