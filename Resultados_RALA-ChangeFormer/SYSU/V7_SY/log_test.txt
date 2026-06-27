@@ -1,0 +1,57 @@
+================ (Sun Jun 07 21:56:27 2026) ================
+gpu_ids: [0] project_name: V7_SY checkpoint_root: checkpoints vis_root: vis num_workers: 16 dataset: CDDataset data_name: SYSU batch_size: 16 split: train split_val: val img_size: 256 shuffle_AB: False n_class: 2 embed_dim: 256 pretrain: None multi_scale_train: True multi_scale_infer: False multi_pred_weights: [0.5, 0.5, 0.5, 0.8, 1.0] net_G: ChangeFormerV7 loss: ce prior_dir: None optimizer: adamw lr: 0.0001 max_epochs: 120 lr_policy: linear lr_decay_iters: 100 checkpoint_dir: checkpoints/V7_SY vis_dir: vis/V7_SY loading last checkpoint...
+Eval Historical_best_acc = 0.8448 (at epoch 78)
+
+Begin evaluation...
+Is_training: False. [1,250],  running_mf1: 0.76889
+Is_training: False. [101,250],  running_mf1: 0.92642
+Is_training: False. [201,250],  running_mf1: 0.89205
+acc: 0.90125 miou: 0.75997 mf1: 0.85828 iou_0: 0.88026 iou_1: 0.63968 F1_0: 0.93632 F1_1: 0.78025 precision_0: 0.92305 precision_1: 0.82097 recall_0: 0.94997 recall_1: 0.74337 
+
+================ (Sun Jun 07 21:58:02 2026) ================
+gpu_ids: [0] project_name: V7_SY print_models: False checkpoints_root: checkpoints vis_root: vis num_workers: 8 dataset: CDDataset data_name: SYSU batch_size: 1 split: test img_size: 256 n_class: 2 embed_dim: 256 net_G: ChangeFormerV7 checkpoint_name: best_ckpt.pt prior_dir: None checkpoint_dir: checkpoints/V7_SY vis_dir: vis/V7_SY loading last checkpoint...
+Eval Historical_best_acc = 0.8448 (at epoch 78)
+
+Begin evaluation...
+Is_training: False. [1,4000],  running_mf1: 0.53060
+Is_training: False. [101,4000],  running_mf1: 0.93606
+Is_training: False. [201,4000],  running_mf1: 0.68747
+Is_training: False. [301,4000],  running_mf1: 0.49588
+Is_training: False. [401,4000],  running_mf1: 0.95472
+Is_training: False. [501,4000],  running_mf1: 0.90606
+Is_training: False. [601,4000],  running_mf1: 0.77952
+Is_training: False. [701,4000],  running_mf1: 0.91306
+Is_training: False. [801,4000],  running_mf1: 0.86264
+Is_training: False. [901,4000],  running_mf1: 0.88906
+Is_training: False. [1001,4000],  running_mf1: 0.70114
+Is_training: False. [1101,4000],  running_mf1: 0.56027
+Is_training: False. [1201,4000],  running_mf1: 0.86224
+Is_training: False. [1301,4000],  running_mf1: 0.50364
+Is_training: False. [1401,4000],  running_mf1: 0.88973
+Is_training: False. [1501,4000],  running_mf1: 0.49102
+Is_training: False. [1601,4000],  running_mf1: 0.83955
+Is_training: False. [1701,4000],  running_mf1: 0.91365
+Is_training: False. [1801,4000],  running_mf1: 0.95252
+Is_training: False. [1901,4000],  running_mf1: 0.54177
+Is_training: False. [2001,4000],  running_mf1: 0.90042
+Is_training: False. [2101,4000],  running_mf1: 0.54862
+Is_training: False. [2201,4000],  running_mf1: 0.97491
+Is_training: False. [2301,4000],  running_mf1: 0.80099
+Is_training: False. [2401,4000],  running_mf1: 0.98777
+Is_training: False. [2501,4000],  running_mf1: 0.82620
+Is_training: False. [2601,4000],  running_mf1: 0.67798
+Is_training: False. [2701,4000],  running_mf1: 0.49237
+Is_training: False. [2801,4000],  running_mf1: 0.97305
+Is_training: False. [2901,4000],  running_mf1: 0.75773
+Is_training: False. [3001,4000],  running_mf1: 0.90333
+Is_training: False. [3101,4000],  running_mf1: 0.30627
+Is_training: False. [3201,4000],  running_mf1: 0.63607
+Is_training: False. [3301,4000],  running_mf1: 0.95791
+Is_training: False. [3401,4000],  running_mf1: 0.47070
+Is_training: False. [3501,4000],  running_mf1: 0.92398
+Is_training: False. [3601,4000],  running_mf1: 0.83248
+Is_training: False. [3701,4000],  running_mf1: 0.85208
+Is_training: False. [3801,4000],  running_mf1: 0.96746
+Is_training: False. [3901,4000],  running_mf1: 0.49727
+acc: 0.90125 miou: 0.75997 mf1: 0.85828 iou_0: 0.88026 iou_1: 0.63968 F1_0: 0.93632 F1_1: 0.78025 precision_0: 0.92305 precision_1: 0.82097 recall_0: 0.94997 recall_1: 0.74337 
+
