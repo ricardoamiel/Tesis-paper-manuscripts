@@ -2,10 +2,9 @@
 /Resultados_RALA-ChangeFormer/Datasets/LEVIR-CD-PLUS-BENCH/val
 /Resultados_RALA-ChangeFormer/Datasets/LEVIR-CD-PLUS-BENCH/test
 
-
 /Resultados_RALA-ChangeFormer/Datasets/SYSU-CD-BENCH/train
-/Resultados_RALA-ChangeFormer/Datasets/SYSU-CD-PLUS-BENCH/val
-/Resultados_RALA-ChangeFormer/Datasets/SYSU-CD-PLUS-BENCH/test
+/Resultados_RALA-ChangeFormer/Datasets/SYSU-CD-BENCH/val
+/Resultados_RALA-ChangeFormer/Datasets/SYSU-CD-BENCH/test
 
 /Resultados_RALA-ChangeFormer/Datasets/WHU-CD-BENCH/train
 /Resultados_RALA-ChangeFormer/Datasets/WHU-CD-BENCH/val
