@@ -10,9 +10,9 @@
 /Resultados_RALA-ChangeFormer/Datasets/WHU-CD-BENCH/val
 /Resultados_RALA-ChangeFormer/Datasets/WHU-CD-BENCH/test
 
-/Resultados_RALA-ChangeFormer/Datasets/S2LOOKING-CD-BENCH/train
-/Resultados_RALA-ChangeFormer/Datasets/S2LOOKING-CD-BENCH/val
-/Resultados_RALA-ChangeFormer/Datasets/S2LOOKING-CD-BENCH/test
+/Resultados_RALA-ChangeFormer/Datasets/S2Looking-BENCH/train
+/Resultados_RALA-ChangeFormer/Datasets/S2Looking-BENCH/val
+/Resultados_RALA-ChangeFormer/Datasets/S2Looking-BENCH/test
 
 /Resultados_RALA-ChangeFormer/LEVIR+/V7_LP/best_ckpt.pt
 /Resultados_RALA-ChangeFormer/LEVIR+/V7_LP/last_ckpt.pt
