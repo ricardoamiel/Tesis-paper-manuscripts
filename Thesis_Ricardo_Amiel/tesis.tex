@@ -17,12 +17,16 @@
 \usepackage{float}
 \usepackage[font=small]{caption}
 \usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{colortbl}
 \usepackage{enumitem}
-
-
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
 
 \usepackage{hyperref}
- % Librería necesaria para arreglar el orden de referencias en overleaf.com
+
+% Colour from conference version
+\definecolor{pastelorange}{HTML}{F5D08A}
 
 \title{Enhancing Computational Efficiency in Multi-Temporal Building Change Detection via Reduced-Rank Linear Attention}
 
@@ -34,16 +38,14 @@ PhD. Cristian José López del Álamo, \\
 PhD. Germain García Zanabria
 }
 
-
-\examinerone{Prof. Dr. Hidalgo Buena Gente}{Presidente}%
-\examinertwo{Prof. Dr. Manuel Armando Líos}{Secretario}%
-\examinerthree{Prof. Dr. Antero A. Gal Oppe}{Integrante}%
-\examinerfour{Prof. Dr. Casso E. Staria}{Externo}{Universidad del ABC} % of being the case
+\examinerone{Prof. Dr. Germain García Zanabria}{Departamento de Ciencia de Datos}%
+\examinertwo{Prof. Dr. Luciano Romero Calla}{Departamento de Ciencia de Datos}%
+\examinerthree{Prof. Dr. Víctor Flores Benitez}{Departamento de Ciencia de Datos}%
+\examinerfour{Prof. Dr. Edward Cayllahua Cahuina}{Externo}{Universidad Católica de San Pablo} % of being the case
 \date{30 de Junio del 2004}
 \date{\today}
 
-\dedicado{
-To my parents, Roxana and Rainer, to my brother, Kenny, and to my cousin Max, who support me and remind me how important it is to enjoy every step of my progress.}
+\dedicado{To my parents, Roxana and Rainer, to my brother, Kenny, and to my cousin Max, who support me and remind me how important it is to enjoy every step of my progress.}
 
 \begin{document}
 \pagestyle{fancy}
@@ -53,7 +55,7 @@ To my parents, Roxana and Rainer, to my brother, Kenny, and to my cousin Max, wh
 
 \approved{\cuatro}%  {\tres} or {\cuatro}
 
-%\include{abreviaturas}
+\include{abreviaturas}
 
 \input{Agradecimientos} %Inserta los agradecimientos
 %\input{Resumen} %Inserta el resumen
@@ -79,9 +81,10 @@ To my parents, Roxana and Rainer, to my brother, Kenny, and to my cousin Max, wh
 \input{Cap_3} %Inserta el capítulo 3
 \input{Cap_4} %Inserta el capítulo 4
 \input{Cap_5} %Inserta el capítulo 5
-\input{conclusiones} %Inserta las conclusiones
+\input{conclusiones} %Inserta el capítulo 6
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \bibliographystyle{apalike}
 \bibliography{referencias}
 \addcontentsline{toc}{chapter}{Bibliografía}
