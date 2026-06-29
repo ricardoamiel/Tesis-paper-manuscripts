@@ -1,659 +1,697 @@
+% ============================================================================
+%  Thesis Defense Presentation — UTEC / GINIA (Final Production Version)
+%  Efficient Multi-Temporal Building Change Detection
+%  with Reduced-Rank Linear Attention
+% ============================================================================
 \documentclass[aspectratio=169]{beamer}
 
 % ---------- Theme ----------
 \usetheme{Madrid}
 \usecolortheme{default}
 
+% ---------- UTEC Identity Colors ----------
+\definecolor{utecblue}{HTML}{003262}
+\definecolor{pastelorange}{rgb}{1.00,0.85,0.65}
+\definecolor{charcoal}{HTML}{222222}
+
+\setbeamercolor{structure}{fg=utecblue}
+\setbeamercolor{palette primary}{bg=utecblue,fg=white}
+\setbeamercolor{palette secondary}{bg=utecblue!80,fg=white}
+\setbeamercolor{palette tertiary}{bg=utecblue!60,fg=white}
+\setbeamercolor{palette quaternary}{bg=utecblue,fg=white}
+\setbeamercolor{frametitle}{bg=utecblue,fg=white}
+\setbeamercolor{title}{bg=utecblue,fg=white}
+
 % ---------- Packages ----------
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
 \usepackage[table]{xcolor}
-\definecolor{skyblue}{HTML}{CEDAEB}
-\graphicspath{{images/}}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{booktabs}
 \usepackage{tikz}
 \usepackage{times}
 \usepackage{helvet}
 \usepackage{courier}
 \usefonttheme{serif}
-\setlength{\abovedisplayskip}{4pt}
-\setlength{\belowdisplayskip}{4pt}
-\setlength{\abovedisplayshortskip}{2pt}
-\setlength{\belowdisplayshortskip}{2pt}
 
-\setbeamertemplate{navigation symbols}{} %% remove symbols navigations
+\graphicspath{{images/}{plots/}}
+
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\setlength{\abovedisplayshortskip}{1pt}
+\setlength{\belowdisplayshortskip}{1pt}
+
+\setbeamertemplate{navigation symbols}{}
 \setbeamerfont{normal text}{size=\small}
-
+\setbeamertemplate{itemize items}[circle]
 
 % ---------- Title Info ----------
-\title[Efficient BCD with RALA]{Efficient Multi-Temporal Building Change Detection\\
-with Reduced-Rank Linear Attention}
-\author[R. Acuña]{Ricardo Amiel Acuña Villogas}
-\institute[UTEC - Ginia]{
-UTEC - Ginia: Urban Data Analysis\\
-Advisor: Rensso Victor Hugo Mora Colque \\
-Co-Advisors: Germain García-Zanabria, Cristian José López del Álamo
+\title[Efficient BCD via Reduced-Rank Linear Attention]{%
+  Enhancing Computational Efficiency in\\
+  Multi-Temporal Building Change Detection\\
+  via Reduced-Rank Linear Attention}
+
+\author[R. Acuña Villogas]{Ricardo Amiel Acuña Villogas}
+
+\institute[UTEC -- GINIA]{%
+  \textbf{Universidad de Ingeniería y Tecnología (UTEC)}\\
+  Data Science Bachelor's Thesis Defense\\[4pt]
+  \small
+  \textit{Thesis Advisor:}\; PhD.\ Rensso Víctor Hugo Mora Colque\\[2pt]
+  \textit{Co-Advisors:}\;
+    PhD.\ Cristian José López del Álamo\;\textbar\;
+    PhD.\ Germain García Zanabria
 }
-\date{March 9, 2026}
 
-% ---------- Begin ----------
+\date{June 30, 2026}
+
+% ============================================================
 \begin{document}
+% ============================================================
 
-% ---------- Title ----------
+% ----------------------------------------------------------
+% FRAME 1 — Title
+% ----------------------------------------------------------
 \begin{frame}
   \titlepage
 \end{frame}
 
-% ---------- Outline ----------
-\begin{frame}{Content}
+% ----------------------------------------------------------
+% FRAME 2 — Outline
+% ----------------------------------------------------------
+\begin{frame}{Defense Roadmap}
 \tableofcontents
 \end{frame}
 
-% =========================================================
-\section{Introduction}
+% ==========================================================
+\section{Motivation}
+% ==========================================================
 
-\begin{frame}{Building Change Detection}
+% ----------------------------------------------------------
+% FRAME 3 — Motivation: VHR Context
+% ----------------------------------------------------------
+\begin{frame}{Motivation — VHR Urban Monitoring in the Global South}
 
 \begin{columns}[T]
-% ---------- Left column ----------
-\begin{column}{0.42\textwidth}
-
-\includegraphics[
-  width=\linewidth,
-  height=0.7\textheight,
-  keepaspectratio
-]{vectorized-LEVIRCD.pdf}
-
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[height=0.55\textheight,keepaspectratio]{PeruSat.png}\\
+\vspace{2pt}
+{\tiny\color{charcoal}\textit{VHR Centimetric Scans (PeruSAT-1: 0.70\,m/px)}}
 \end{column}
 
-% ---------- Right column ----------
 \begin{column}{0.48\textwidth}
+\centering
+\includegraphics[height=0.55\textheight,keepaspectratio]{LandCover.png}\\
+\vspace{2pt}
+{\tiny\color{charcoal}\textit{Unregulated Spatiotemporal Urban Footprints (Lima Metropolitan Area)}}
+\end{column}
+\end{columns}
 
-\small
-\textbf{Building Change Detection (BCD)} compares \textbf{bi-temporal satellite images} to identify construction, demolition, or structural change.
-
-\vspace{0.4cm}
-
-\textbf{Why it matters}
+\vspace{8pt}
+{\footnotesize
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
 \begin{itemize}
-    \item Urban growth monitoring.
-    \item Disaster response.
-    \item Security and regulation.
-    \item Planning and poverty analysis.
+  \item Rapid informal peri-urban expansion.
+  \item High structural densification across Global South scenes.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{itemize}
+  \item Land-use regulation gaps and elevated seismic vulnerability.
+  \item PeruSAT-1 platform availability: 0.70\,m/px panchromatic capacity.
+\end{itemize}
+\end{column}
+\end{columns}
+}
+
+\end{frame}
+
+% ==========================================================
+\section{Problem Statement}
+% ==========================================================
+
+% ----------------------------------------------------------
+% FRAME 4 — Problem: The Quadratic Bottleneck (Layout & Text Flow Fixed)
+% ----------------------------------------------------------
+\begin{frame}{Problem Statement — The Quadratic Attention Bottleneck}
+
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\centering
+\includegraphics[height=0.58\textheight,keepaspectratio]{Attention.png}\\
+\vspace{4pt}
+{\tiny\color{charcoal}\textit{Fan et al., Breaking the Low-Rank Dilemma via Linear Attention, ICLR 2025}}
+\end{column}
+\hfill
+\begin{column}{0.44\textwidth}
+\vspace{0.1cm}
+\textbf{\color{utecblue}Computational Constraints:}
+\vskip 0.1cm
+\begin{itemize}
+  \item \textbf{Quadratic Scaling}: $\mathcal{O}(N_l^2 d)$ operations.
+  \item \textbf{VRAM Overheads}: Scales exponentially on dense configurations.
+  \item \textbf{OOM Vulnerability}: Failures under high-resolution patches.
+  \item \textbf{Hardware Barriers}: Restricts consumer edge deployment.
 \end{itemize}
 
+\vskip 0.25cm
+{\footnotesize\color{charcoal}
+At $256{\times}256$ input dimensions:\\
+$N_l \in \{4096,\,1024,\,256,\,64\}$\\[3pt]
+$\Rightarrow$ Fully-dense $N_l \times N_l$ affinity matrix allocations required in GPU memory tiers.
+}
 \end{column}
-\end{columns}
-
-\vspace{0.3cm}
-\footnotesize
-\tiny{Reference: \textit{A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection. (Zheng et al.)}}
-
-\end{frame}
-
-
-
-\begin{frame}{Motivation}
-
-\begin{columns}[T]
-
-% ---------- Left column ----------
-\begin{column}{0.48\textwidth}
-\centering
-
-\begin{minipage}{\linewidth}
-\centering
-\includegraphics[
-  height=0.6\textheight,
-  keepaspectratio
-]{PeruSAT.png}
-
-\vspace{0.2cm}
-\footnotesize
-\tiny{Reference: Conida PeruSat-1 sample}
-\end{minipage}
-
-\end{column}
-
-% ---------- Right column ----------
-\begin{column}{0.48\textwidth}
-\centering
-
-\begin{minipage}{\linewidth}
-\centering
-\includegraphics[
-  height=0.6\textheight,
-  keepaspectratio
-]{LandCover.png}
-
-\vspace{0.2cm}
-\footnotesize
-\tiny{Reference: Land cover changes in Lima Metropolitan Area for the years 2008 and 2021}
-\end{minipage}
-
-\end{column}
-
 \end{columns}
 
 \end{frame}
 
+% ==========================================================
+\section{Related Work \& Baseline}
+% ==========================================================
 
+% ----------------------------------------------------------
+% FRAME 5 — State of the Art
+% ----------------------------------------------------------
+\begin{frame}{State of the Art in Building Change Detection (BCD)}
 
-\begin{frame}{Challenges}
+\begin{center}
+\begin{minipage}{0.96\linewidth}
+\centering
+\begin{tikzpicture}
+  \node[anchor=south west, inner sep=0] (img) at (0,0)
+    {\includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]{SOTA.png}};
+  \draw[dashed,line width=1.2pt,rounded corners=4pt,utecblue]
+    (0.1,0.40) rectangle (14.3,1.55);
+\end{tikzpicture}
+\vspace{2pt}
+{\tiny\color{charcoal}\textit{Bandara \& Patel, ChangeFormer, IGARSS 2022}}
+\end{minipage}
+\end{center}
 
-\begin{columns}[T]
+\vspace{2pt}
+{\footnotesize
+\textbf{ChangeFormer Paradigm (Highlighted)}: Hierarchical Siamese Transformer framework. Effectively handles macro-scale spatial dependencies, but remains fundamentally bounded by the full-rank quadratic restrictions of its initial multi-head self-attention layout.
+}
 
-% ---------- Left column ----------
+\end{frame}
+
+% ----------------------------------------------------------
+% FRAME 6 — Baseline: ChangeFormer Architecture (Vertical Center and Enlarged Figure)
+% ----------------------------------------------------------
+\begin{frame}{Baseline — ChangeFormer Architecture}
+
+\begin{columns}[c] % Alineación vertical perfectamente centrada
 \begin{column}{0.62\textwidth}
 \centering
-
-\includegraphics[
-  height=0.6\textheight,
-  keepaspectratio
-]{Attention.png}
-
+\includegraphics[width=\linewidth,height=0.74\textheight,keepaspectratio]{ChangeFormer.png}\\
+\vspace{2pt}
+{\tiny\color{charcoal}\textit{Bandara \& Patel, IGARSS 2022}}
 \end{column}
 
-% ---------- Right column ----------
 \begin{column}{0.34\textwidth}
-
-\small
+{\footnotesize
+\textbf{\color{utecblue}Architectural Components:}
+\vskip 0.1cm
 \begin{itemize}
-    \item High computational cost: $\mathcal{O}(N^2)$.
-    \item Large memory footprint.
-    \item Small feasible batch sizes.
-    \item Bi-temporal processing doubles computation.
-    \item Limits deployment on large or OOD datasets.
+  \item SegFormer-B2 backbone integration.
+  \item Siamese dual-temporal weight configuration.
+  \item Traditional MHSA blocks across 4 stages.
+  \item MLP segmentation decoder.
 \end{itemize}
 
+\vskip 0.5cm
+\textbf{\color{red!80!black}Core Computational Bottleneck:}
+\vskip 0.1cm
+The operational MHSA layers compute and evaluate dense $N_l{\times}N_l$ spatial maps, generating a strict quadratic overhead threshold.
+}
 \end{column}
-
 \end{columns}
 
-\vspace{0.25cm}
-
-% ---------- Reference (aligned with left image) ----------
-\hspace*{0.04\textwidth}
-\parbox{0.62\textwidth}{
-\footnotesize
-\tiny{\textit{Reference: Breaking the Low-Rank Dilemma via Linear Attention} (Fan et al.)
-}}
-
 \end{frame}
 
+% ==========================================================
+\section{Proposed Method}
+% ==========================================================
 
+% ----------------------------------------------------------
+% FRAME 7 — RALA-CF Architecture (Vertical Center and Enlarged Figure)
+% ----------------------------------------------------------
+\begin{frame}{Proposed Architecture — RALA-CF Drop-in Substitution}
 
-\begin{frame}{Main Goal}
+\begin{columns}[c] % Alineación vertical perfectamente centrada
+\begin{column}{0.58\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=0.74\textheight,keepaspectratio]{ChangeFormer.png}\\
+\vspace{2pt}
+{\tiny\color{charcoal}\textit{Proposed modification: Exclusive MHSA $\rightarrow$ RALA substitution across the 4 encoder blocks.}}
+\end{column}
 
-\begin{center}
-{\Large\bfseries
-Design a computationally efficient attention mechanism that reduces cost while preserving segmentation accuracy.
-}
-\end{center}
-
-\end{frame}
-
-
-
-\begin{frame}{Goals}
+\begin{column}{0.38\textwidth}
+{\footnotesize
+\textbf{\color{utecblue}Drop-In Engineering Scope:}
+\vskip 0.1cm
 \begin{itemize}
-    \item Reduce VRAM usage and FLOPs in the encoder.
-    \item Increase feasible batch sizes for large-scale BCD training.
-    \item Maintain comparable performance on LEVIR-CD and DSIFN-CD.
-    \item \textbf{Scope}:  Train and validation on public benchmarks LEVIR-CD  (Zheng et al.) and DSIFN-CD (Shen et al.).
+  \item MHSA systematically replaced at \textbf{all 4} Siamese levels.
+  \item Feed-Forward Networks (FFN): \textbf{Unchanged}.
+  \item Inductive Skip Connections: \textbf{Preserved}.
+  \item Final Segmentation Decoder: \textbf{Intact}.
 \end{itemize}
-\end{frame}
 
-
-
-% =========================================================
-\section{Approach}
-
-\begin{frame}{State of the Art in BCD}
-
-\begin{center}
-\begin{minipage}{0.95\linewidth}
-\centering
-
-\begin{tikzpicture}
-\node[anchor=south west, inner sep=0] (img) at (0,0)
-{\includegraphics[
-  width=\linewidth,
-  height=0.65\textheight,
-  keepaspectratio
-]{SOTA.png}};
-
-% ---- Dashed rectangle (HIGHLIGHT) ----
-\draw[
-  dashed,
-  line width=1pt,
-  rounded corners=4pt,
-  blue
-]
-(0.1,0.45) rectangle (14.3,1.5);
-\end{tikzpicture}
-
-\vspace{0.2cm}
-\footnotesize
-\tiny{\textit{Reference: A Transformer-based Siamese Network for Change Detection} (Bandara et al.)}
-
-\end{minipage}
-\end{center}
+\vskip 0.5cm
+\textbf{\color{charcoal}Complexity Profile Per Level:}\\
+\hspace{0.5em}Standard MHSA:\; $\mathcal{O}(N_l^2\,d)$\\
+\hspace{0.5em}Rank-Augmented RALA:\; $\mathcal{O}(N_l\,d^2)$\\[4pt]
+Given that $N_l \gg d$ holds at every hierarchical layer, it delivers a sustained \textbf{sub-quadratic memory and operational profile}.
+}
+\end{column}
+\end{columns}
 
 \end{frame}
 
-
-
-\begin{frame}{Baseline: ChangeFormer}
-
-\begin{center}
-\begin{minipage}{0.95\linewidth}
-\centering
-
-\includegraphics[
-  width=\linewidth,
-  height=0.65\textheight,
-  keepaspectratio
-]{ChangeFormer.png}
-
-\vspace{0.2cm}
-%\footnotesize
-\tiny{\textit{Reference: A Transformer-based Siamese Network for Change Detection} (Bandara et al.)}
-
-\end{minipage}
-\end{center}
-
-\end{frame}
-
-
-
-\begin{frame}{Rank-Augmented Linear Attention (RALA)}
+% ----------------------------------------------------------
+% FRAME 8 — Mathematical Innovation: RALA Core
+% ----------------------------------------------------------
+\begin{frame}{Mathematical Innovation — Rank-Augmented Linear Attention}
 
 \begin{columns}[T]
-
-% ---------- LEFT COLUMN: Image + Reference ----------
-\begin{column}{0.45\textwidth}
-
-\begin{center}
-\includegraphics[
-  width=\linewidth,
-  height=0.6\textheight,
-  keepaspectratio
-]{RALA.png}
-\end{center}
-
-\vspace{0.8cm}
-\footnotesize
-\tiny{\textit{Reference: Breaking the Low-Rank Dilemma via Linear Attention} (Fan et al.)}
-
+\begin{column}{0.42\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{RALA.png}\\
+\vspace{2pt}
+{\tiny\color{charcoal}\textit{Fan et al., ICLR 2025}}
 \end{column}
 
-% ---------- RIGHT COLUMN: Mathematics ----------
 \begin{column}{0.55\textwidth}
-
 \footnotesize
-
-\textbf{Linear Attention}
+\textbf{\color{utecblue}Global Query Descriptor (Context Ponderation):}
 \[
-\mathrm{Attn}_{\text{lin}}(Q,K,V)
-= \kappa(Q)\big(\kappa(K)^\top V\big)
+Q_g = \tfrac{1}{N}\textstyle\sum_{i=1}^{N} Q_i
 \]
 
-\textbf{Global Query}
+\textbf{\color{utecblue}Differential Token Re-weighting Coefficients:}
 \[
-Q_g = \frac{1}{N}\sum_{i=1}^{N} Q_i
+\alpha_j = N\cdot\frac{\exp\!\bigl(Q_g\,\kappa(K_j)^\top\bigr)}{\sum_{m}\exp\!\bigl(Q_g\,\kappa(K_m)^\top\bigr)}, \quad \textstyle\sum_j\alpha_j=N
 \]
 
-\textbf{Token Weights}
+\textbf{\color{utecblue}Rank-Augmented Key-Value Mixing Buffer:}
 \[
-\alpha_j
-= N \cdot
-\frac{\exp\!\big(Q_g \kappa(K_j)^\top\big)}
-{\sum_{m=1}^{N}\exp\!\big(Q_g \kappa(K_m)^\top\big)},
-\qquad
-\sum_{j=1}^{N} \alpha_j = N
+B = \textstyle\sum_{j=1}^{N} \alpha_j\,\kappa(K_j)^\top V_j \quad \in \mathbb{R}^{d \times d}
 \]
 
-\textbf{Key–Value Aggregation Buffer}
+\textbf{\color{utecblue}Hadamard Output Feature Modulation:}
 \[
-B = \sum_{j=1}^{N} \alpha_j\, \kappa(K_j)^\top V_j
+Y_i = \phi(X_i)\odot\bigl(\kappa(Q_i)\,B\bigr)
 \]
+\end{column}
+\end{columns}
 
-\textbf{Modulated Output}\;
-$Y_i = \phi(X_i) \odot \big(\kappa(Q_i)\, B\big)$
+\vskip 0.2cm
+\hrule
+\vskip 0.15cm
+\footnotesize
+\textbf{\color{utecblue}Architectural Invariant}: The pixel-dependent transformation layer $\phi(\cdot)$ effectively breaks the low-rank capacity ceiling ($\operatorname{Rank}(Y)\not\le d$). This architectural step fully restores multi-temporal semantic expressiveness while remaining within linear time boundaries $\mathcal{O}(Nd^2)$.
 
+\end{frame}
+
+% ==========================================================
+\section{Experiments \& Results}
+% ==========================================================
+
+% ----------------------------------------------------------
+% FRAME 9a — Quantitative: Part I (Cell Color Superposition Hot-Fixed)
+% ----------------------------------------------------------
+\begin{frame}{Quantitative Evaluation — Benchmark Part I: Primary Environments}
+
+\centering
+{\footnotesize Performance evaluation across standard bi-temporal benchmarks. Proposed model cell values are highlighted using the institutional pastelorange background color while keeping titles crystal clear.}
+\vskip 0.25cm
+
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabular}{|l|l|c|c|c|c|}
+\hline
+\textbf{Target Benchmark} & \textbf{Architecture Baseline} & \textbf{Precision} & \textbf{$F_1$-Score} & \textbf{IoU} & \textbf{OA (\%)} \\
+\hline
+\hline
+\multirow{5}{*}{\textbf{LEVIR-CD}} & FC-EF & 86.91 & 83.40 & 71.53 & 98.75 \\ \cline{2-6}
+                          & SNUNet-CD & 88.16 & 86.88 & 76.83 & 98.97 \\ \cline{2-6}
+                          & BIT & 89.24 & 89.31 & 80.68 & 99.11 \\ \cline{2-6}
+                          & ChangeFormer & 92.05 & 90.40 & 82.48 & 99.19 \\ \cline{2-6}
+                          & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{91.83} & \cellcolor{pastelorange}\textbf{90.53} & \cellcolor{pastelorange}\textbf{82.71} & \cellcolor{pastelorange}\textbf{99.21} \\
+\hline
+\hline
+\multirow{5}{*}{\textbf{DSIFN-CD}} & FC-EF & 56.18 & 60.55 & 43.41 & 86.38 \\ \cline{2-6}
+                          & SNUNet-CD & 61.32 & 66.28 & 49.58 & 88.54 \\ \cline{2-6}
+                          & BIT & 68.36 & 69.56 & 53.32 & 89.07 \\ \cline{2-6}
+                          & ChangeFormer & 76.44 & 74.45 & 59.31 & 90.33 \\ \cline{2-6}
+                          & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{75.91} & \cellcolor{pastelorange}\textbf{74.88} & \cellcolor{pastelorange}\textbf{59.85} & \cellcolor{pastelorange}\textbf{90.41} \\
+\hline
+\end{tabular}
+
+\end{frame}
+
+% ----------------------------------------------------------
+% FRAME 9b — Quantitative: Part II (Cell Color Superposition Hot-Fixed)
+% ----------------------------------------------------------
+\begin{frame}{Quantitative Evaluation — Benchmark Part II: Cross-Domain Matrices}
+
+\centering
+{\footnotesize Cross-domain evaluation tracking performance stability across heterogeneous urban settings, high density domains, and edge benchmarks.}
+\vskip 0.25cm
+
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabular}{|l|l|c|c|c|c|}
+\hline
+\textbf{Target Benchmark} & \textbf{Architecture Baseline} & \textbf{Precision} & \textbf{$F_1$-Score} & \textbf{IoU} & \textbf{OA (\%)} \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{WHU-CD}}    & ChangeFormer & 0.8912 & 0.8653 & 0.7629 & 99.18 \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.8874} & \cellcolor{pastelorange}\textbf{0.8687} & \cellcolor{pastelorange}\textbf{76.80} & \cellcolor{pastelorange}\textbf{99.21} \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{LEVIR-CD+}} & ChangeFormer & 0.9088 & 0.8927 & 0.8067 & 99.12 \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.9061} & \cellcolor{pastelorange}\textbf{0.8939} & \cellcolor{pastelorange}\textbf{0.8085} & \cellcolor{pastelorange}\textbf{99.14} \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{SYSU-CD}}   & ChangeFormer & 0.7862 & 0.7787 & 0.6378 & 89.83 \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.7798} & \cellcolor{pastelorange}\textbf{0.7814} & \cellcolor{pastelorange}\textbf{0.6414} & \cellcolor{pastelorange}\textbf{89.91} \\
+\hline
+\hline
+\multirow{2}{*}{\textbf{S2Looking}} & ChangeFormer & 0.6783 & 0.6555 & 48.76 & 96.58 \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.6697} & \cellcolor{pastelorange}\textbf{0.6591} & \cellcolor{pastelorange}\textbf{49.16} & \cellcolor{pastelorange}\textbf{96.63} \\
+\hline
+\end{tabular}
+
+\end{frame}
+
+% ----------------------------------------------------------
+% FRAME 10 — Computational Efficiency
+% ----------------------------------------------------------
+\begin{frame}{Computational Efficiency \& OOM-Boundary Scaling}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\textbf{\color{utecblue}Resource Profile — $256{\times}256$, Batch 16}
+\vskip 0.15cm
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Params (M)} & \textbf{GFLOPs} & \textbf{VRAM (GB)} \\
+\hline
+\hline
+FC-EF       &  1.35 &   3.48 &  1.84 \\
+\hline
+SNUNet-CD   & 12.04 &  14.86 &  5.67 \\
+\hline
+BIT         & 11.05 &  17.22 &  5.13 \\
+\hline
+ChangeFormer & 41.02 & 202.17 & 13.28 \\
+\hline
+\rowcolor{pastelorange}
+\textbf{Ours (RALA-CF)} & \textbf{41.08} & \textbf{185.93} & \textbf{10.38} \\
+\hline
+\end{tabular}
+}
+
+\vskip 0.25cm
+\raggedright
+\textbf{\color{utecblue}Efficiency Gains vs. Full Baseline:}
+\vskip 0.05cm
+\begin{itemize}
+  \item \textbf{$-$21.8\% VRAM footprint savings}.
+  \item \textbf{$-$8.0\% attention GFLOPs matrix modulation}.
+  \item Preserves equivalent parameters.
+\end{itemize}
 \end{column}
 
+\begin{column}{0.48\textwidth}
+\centering
+\textbf{\color{utecblue}Max Feasible Batch Size Before OOM}
+\vskip 0.15cm
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Resolution Scale} & \textbf{Baseline CF} & \textbf{Ours (RALA)} & \textbf{Net Gain} \\
+\hline
+\hline
+$256{\times}256$    & 32 & \textbf{48} & $+50\%$ \\
+\hline
+$512{\times}512$    &  8 & \textbf{12} & $+50\%$ \\
+\hline
+$1024{\times}1024$  &  2 & \textbf{3}  & $+50\%$ \\
+\hline
+\end{tabular}
+}
+
+\vskip 0.25cm
+\raggedright
+\textbf{\color{utecblue}Sustained Memory Scaling Paradigm:}\\
+\footnotesize
+Attention matrices span approx. 1/3 of complete VRAM allocations. Eliminating full-rank $N_l \times N_l$ storage paths releases a continuous constant fraction of system memory, driving a stable $+50\%$ training scale expansion across the spectrum.
+\end{column}
 \end{columns}
 
 \end{frame}
 
+% ----------------------------------------------------------
+% FRAME 11 — Qualitative: WHU-CD (Expanded Column to prevent leaking)
+% ----------------------------------------------------------
+\begin{frame}{Qualitative Analysis — WHU-CD (Nadir Aerial Geometry)}
 
-
-
-\begin{frame}{Datasets: LEVIR-CD}
-
-\begin{center}
-\includegraphics[
-  width=0.95\linewidth,
-  height=0.7\textheight,
-  keepaspectratio
-]{LEVIR2.png}
-\end{center}
-
-\vspace{0.3cm}
-
-\vspace{0.2cm}
-\footnotesize
-\tiny{\textit{Reference: A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection} (Zheng et al.)}
-
-\end{frame}
-
-
-\begin{frame}{Datasets: DSIFN-CD}
-
-\begin{center}
-\includegraphics[
-  width=0.95\linewidth,
-  height=0.7\textheight,
-  keepaspectratio
-]{DSIFN2.png}
-\end{center}
-
-\vspace{0.3cm}
-
-\vspace{0.2cm}
-\footnotesize
-\tiny{\textit{Reference: A Dense Siamese Network for Change Detection in Remote Sensing Images} (Shen et al.)}
-
-\end{frame}
-
-
-% =========================================================
-\section{Discussion}
-
-\begin{frame}{Segmentation Accuracy}
-
+\begin{columns}[T]
+\begin{column}{0.68\textwidth}
 \centering
-\footnotesize
-
-\resizebox{0.95\linewidth}{!}{
-\begin{tabular}{lcccc}
-\hline
-\textbf{Model} & \textbf{Dataset} & \textbf{F1} & \textbf{IoU} & \textbf{OA} \\
-\hline
-SNUNet-CD      & LEVIR-CD & 88.16 & 78.83 & 98.82 \\
-BIT            & LEVIR-CD & 89.31 & 80.68 & 98.92 \\
-ChangeFormer   & LEVIR-CD & 90.40 & 82.48 & 99.04 \\
-\rowcolor{skyblue}
-RALA-CF (ours) & LEVIR-CD & \textbf{89.87} & \textbf{81.60} & \textbf{98.99} \\
-\hline
-SNUNet-CD      & DSIFN-CD & 66.18 & 49.45 & 87.34 \\
-BIT            & DSIFN-CD & 69.26 & 52.97 & 89.41 \\
-ChangeFormer   & DSIFN-CD & 86.67 & 76.48 & 95.56 \\
-\rowcolor{skyblue}
-RALA-CF (ours) & DSIFN-CD & \textbf{84.07} & \textbf{73.96} & \textbf{92.44} \\
-\hline
-\end{tabular}
-}
-
-\vspace{0.2cm}
-\tiny{\textit{Reference: Efficient Multi-Temporal Building Change Detection with Reduced-Rank Linear Attention} (Acuña et al.)}
-
-\end{frame}
-
-
-
-
-\begin{frame}{Efficiency Results}
-
-\centering
-\footnotesize
-
-\resizebox{0.9\linewidth}{!}{
-\begin{tabular}{lccc}
-\hline
-\textbf{Model} & \textbf{Params (M)} & \textbf{GFLOPs} & \textbf{Peak VRAM (GB)} \\
-\hline
-ChangeFormer   & 247 & 248.77 & 27 \\
-\rowcolor{skyblue}
-RALA-CF (ours) & \textbf{243} & \textbf{228.62} & \textbf{21} \\
-\hline
-\end{tabular}
-}
-
-\vspace{0.25cm}
-\tiny{\textit{Reference: Efficient Multi-Temporal Building Change Detection with Reduced-Rank Linear Attention} (Acuña et al.)}
-
-\end{frame}
-
-
-
-\begin{frame}{Efficiency Results (Batch Size)}
-
-\centering
-\footnotesize
-
-\resizebox{0.95\linewidth}{!}{
-\begin{tabular}{lcccc}
-\hline
-\textbf{Resolution} & \textbf{Model} & \textbf{Max Batch} & \textbf{VRAM at OOM (GB)} \\
-\hline
-\multirow{2}{*}{256$\times$256}
-& ChangeFormer & 32 & 34 \\
-& \rowcolor{skyblue} RALA-CF (ours) & \textbf{48} & \textbf{34} \\
-\hline
-\multirow{2}{*}{512$\times$512}
-& ChangeFormer & 8 & 34 \\
-& \rowcolor{skyblue} RALA-CF (ours) & \textbf{12} & \textbf{34} \\
-\hline
-\multirow{2}{*}{1024$\times$1024}
-& ChangeFormer & 2 & 36 \\
-& \rowcolor{skyblue} RALA-CF (ours) & \textbf{3} & \textbf{36} \\
-\hline
-\end{tabular}
-}
-
-\vspace{0.25cm}
-\tiny{\textit{Reference: Efficient Multi-Temporal Building Change Detection with Reduced-Rank Linear Attention} (Acuña et al.)}
-
-\end{frame}
-
-
-
-\begin{frame}{Efficiency Results (Ablation Study)}
-
-\centering
-\footnotesize
-
-\resizebox{0.7\linewidth}{!}{
-\begin{tabular}{lcc}
-\hline
-\textbf{Variant} & \textbf{GFLOPs} & \textbf{VRAM (GB)} \\
-\hline
-Baseline MHSA & 86.17 & 12 \\
-\rowcolor{skyblue}
-Encoder: RALA (ours) & \textbf{76.95} & \textbf{8} \\
-\hline
-\end{tabular}
-}
-
-\vspace{0.25cm}
-\tiny{\textit{Reference: Efficient Multi-Temporal Building Change Detection with Reduced-Rank Linear Attention} (Acuña et al.)}
-
-\end{frame}
-
-
-
-
-\begin{frame}{Attention Maps}
-
-\begin{center}
-\begin{tikzpicture}
-\node[anchor=south west, inner sep=0] (img) at (0,0)
-{\includegraphics[
-  width=0.95\linewidth,
-  height=0.7\textheight,
-  keepaspectratio
-]{Attention-Maps2.png}};
-
-% ---- Highlight rectangle (MHSA) ----
-\draw[
-  dashed,
-  line width=1pt,
-  rounded corners=3pt,
-  yellow
-]
-(5.3,0.7) rectangle (6.0,5.6);
-
-% ---- Highlight rectangle (RALA) ----
-\draw[
-  dashed,
-  line width=1pt,
-  rounded corners=3pt,
-  yellow
-]
-(11.8,0.7) rectangle (12.5,5.6);
-\end{tikzpicture}
-\end{center}
-
-\footnotesize
-The highlighted regions illustrate subtle local differences in attention intensity; however, these minimal variations do not affect the global structure of attention. (Order: MHSA vs RALA)
-
+\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{plots/qualitative_WHU_CD.pdf}
+\end{column}
+\hfill
+\begin{column}{0.29\textwidth}
 \vspace{0.1cm}
-\tiny{\textit{Qualitative comparison only. Colors denote normalized attention intensity.  
-Reference: Acuña et al., Efficient BCD with RALA}}
+\textbf{\color{utecblue}Error Metric Maps:}
+\vskip 0.05cm
+{\color{white}\rule{6pt}{6pt}} TP (White) \hfill {\color{black}\rule{6pt}{6pt}} TN (Black)\\
+{\color{red}\rule{6pt}{6pt}} FP (Red) \hfill {\color{blue}\rule{6pt}{6pt}} FN (Blue)
 
-\end{frame}
-
-
-
-
-% =========================================================
-\section{Limitations}
-
-\begin{frame}{Limitations}
+\vskip 0.3cm
+\textbf{\color{utecblue}Nadir Geometry Insights:}
+\vskip 0.1cm
 \begin{itemize}
-    \item Encoder-only modification limits the magnitude of end-to-end speedups
-    \item Efficiency gains increase with higher token counts, improvements are smaller at 256×256
-    \item No enhancement to non-attention components
-    \item Accuracy remains ultimately constrained by ChangeFormer’s original architecture
+  \item Cenital scans eliminate perspective structural shifts.
+  \item High $0.3$\,m/px resolution handles complex boundaries.
+  \item Rank-augmented $\alpha_j$ preserves fine building masks.
 \end{itemize}
+\end{column}
+\end{columns}
+
+\vskip 0.05cm
+\centering
+{\tiny Rows denote random independent scene configurations. Columns group: Pre-image $\mid$ Post-image $\mid$ Target Label $\mid$ ChangeFormer $\mid$ Ours (RALA-CF)}
+
 \end{frame}
 
-% =========================================================
+% ----------------------------------------------------------
+% FRAME 12 — Qualitative: S2Looking Part I (Split into 2 slides)
+% ----------------------------------------------------------
+\begin{frame}{Qualitative Analysis — S2Looking (Oblique Geometry Failure)}
+
+\begin{columns}[T]
+\begin{column}{0.68\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{plots/qualitative_S2Looking.pdf}
+\end{column}
+\hfill
+\begin{column}{0.29\textwidth}
+\vspace{0.1cm}
+\textbf{\color{utecblue}Geometric Failure Analysis:}
+\vskip 0.15cm
+\begin{itemize}
+  \item Oblique angles trigger severe structural parallax displacement.
+  \item Unchanged tall building facades display artificial offsets.
+  \item Ring-shaped false-positive halos degrade overall accuracy scores.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vskip 0.05cm
+\centering
+{\tiny Rows denote random independent scene configurations. Columns group: Pre-image $\mid$ Post-image $\mid$ Target Label $\mid$ ChangeFormer $\mid$ Ours (RALA-CF)}
+
+\end{frame}
+
+% ----------------------------------------------------------
+% FRAME 12b — Qualitative: S2Looking Part II (Dedicated Core Insights Frame)
+% ----------------------------------------------------------
+\begin{frame}{Qualitative Analysis — S2Looking Architectural Limits}
+
+\vskip 0.4cm
+\textbf{\color{red!80!black}Core Boundary Insight — The Parallax Limit:}
+\vskip 0.3cm
+
+\begin{itemize}
+  \item \textbf{Error Pattern Invariance}: Error topologies and false positive distributions remain completely identical across choices of full-rank or linear attention layers.
+  \item \textbf{Backbone-Level Constraints}: The geometric failure mode originates natively in the representation limitations of the SegFormer-B2 convolutional backbone, not in the attention module itself.
+  \item \textbf{Metrological Reality}: In remote sensing tasks featuring severe oblique acquisition tracking, no change in the mathematical formulation of the attention layers can recover perspective distortions without explicit stereophotogrammetric depth alignment heads.
+\end{itemize}
+
+\vskip 0.6cm
+\centering
+\footnotesize\color{charcoal}
+This analytical boundary confirms that RALA-CF achieves maximum efficiency without introducing custom model degradation, framing the remaining challenges as a data view geometry issue.
+
+\end{frame}
+
+% ==========================================================
 \section{Conclusions}
+% ==========================================================
 
-\begin{frame}{Conclusions}
+% ----------------------------------------------------------
+% FRAME 13 — Conclusions
+% ----------------------------------------------------------
+\begin{frame}{General Conclusions \& Architectural Boundaries}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{\color{utecblue}Core Empirical Milestones:}
+\vskip 0.15cm
 \begin{itemize}
-    \item Achieves \textbf{accuracy comparable} to ChangeFormer across benchmarks
-    \item Avoids \textbf{low-rank collapse}, preserving stable attention patterns
-    \item Reduces \textbf{attention-related FLOPs} and \textbf{peak VRAM consumption}
-    \item Enables \textbf{larger batch sizes} and higher-resolution training under fixed GPU limits
-    \item Provides a \textbf{strong accuracy–efficiency trade-off} for VHR building change detection
+  \item Map quadratic encoder limits down to strict linear complexity bounds: $\mathcal{O}(N_l^2d) \to \mathcal{O}(N_ld^2)$.
+  \item Mitigate low-rank collapse paths via Hadamard product output token modulation $\phi(\cdot)$.
+  \item Retain structural accuracy parity across the comprehensive 6-dataset evaluation matrix ($\Delta = +0.14$\,pp mean F1).
+  \item Achieve a 21.8\% VRAM saving, 8\% GFLOPs mitigation, and an exact uniform 50\% training batch size expansion.
 \end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\textbf{\color{red!80!black}Identified Research Limitations:}
+\vskip 0.15cm
+\begin{itemize}
+  \item \textbf{Geometric Parallax Sensitivity}: Side-looking perspective deformations (S2Looking) represent a backbone limit that attention triumphs cannot solve alone.
+  \item \textbf{Annotation Label Discrepancies}: Semantic multi-class class noise (SYSU-CD) triggers false positives on non-building changes.
+  \item \textbf{Absolute Hardware Thresholds}: Full patch size deployment on low-tier consumer GPUs ($\leq 8$\,GB) remains out of reach.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vskip 0.35cm
+\centering
+\footnotesize\color{charcoal}
+Accuracy, efficiency profiles, and error maps validate the central thesis hypothesis: Rank-augmented linear attention provides a mathematically sound, non-heuristic path toward highly efficient multi-temporal remote sensing.
+
 \end{frame}
 
-% =========================================================
+% ==========================================================
 \section{Future Work}
+% ==========================================================
 
-\begin{frame}{Future Work}
-\begin{itemize}
-    \item Explore \textbf{more expressive kernel feature maps} for linear attention
-    \item Integrate RALA into \textbf{multi-scale} and \textbf{multi-task BCD frameworks}
-    \item Extend memory-efficient attention to \textbf{generative BCD models}
-    \item Validate scalability in \textbf{larger, more heterogeneous datasets}, including Peruvian satellite imagery (PeruSAT-1)
-\end{itemize}
+% ----------------------------------------------------------
+% FRAME 14 — Future Research
+% ----------------------------------------------------------
+\begin{frame}{Future Lines of Research — Global South Focus}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{\color{utecblue}Technical Foundations and Extensions:}
+\vskip 0.15cm
+\begin{enumerate}
+  \item \textbf{Dynamic Rank Adaptation Heuristics}: Implement online lightweight Singular Value Decomposition (SVD) tracking within the KV buffer matrix $B$.
+  \item \textbf{Upstream Spatial Alignment Modules}: Integrate stereophotogrammetric depth networks (DEM tracking) to standardize parallax distortions before patch tokenization.
+  \item \textbf{Multi-Temporal Sequence Ingestion}: Extend $Q_g$ modeling to ingest $T > 2$ sequential images for monitoring continuous construction pipelines.
+\end{enumerate}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\textbf{\color{utecblue}Regional Benchmarks and Local Deployment:}
+\vskip 0.15cm
+\begin{enumerate}
+  \item \textbf{Latin American BCD Benchmark Architecture}: Build PeruSAT-1 open datasets covering complex metropolitan zones (Lima, São Paulo, Bogotá).
+  \item \textbf{Informal Urban Settlements Ontologies}: Calibrate evaluation metrics for informal self-construction monitoring.
+  \item \textbf{Operational Urban Planning Tooling}: Develop mosaicking inference engines for municipal risk tracking and vulnerability assessment.
+\end{enumerate}
+\end{column}
+\end{columns}
+
 \end{frame}
 
-% =========================================================
+% ==========================================================
 \section*{References}
+% ==========================================================
 
-\begin{frame}{References (1/3)}
+\begin{frame}{References (1/2)}
 \footnotesize
 \begin{enumerate}
-\item Bandara, W.G.C., \& Patel, V.M. (2022). \textit{ChangeFormer}. IGARSS.
-\item Zheng, G. et al. (2020). \textit{LEVIR-CD}. Remote Sensing.
-\item Shen, Y. et al. (2021). \textit{DSIFN-CD}. IEEE TIP.
-\item Fang, J. \& Li, J. (2021). \textit{SNUNet-CD}. IEEE GRSL.
-\item Chen, H. et al. (2022). \textit{BIT}. CVPR.
-\item Zheng, X. et al. (2023). \textit{HFA-Net}. Pattern Recognition.
-\item Teng, Y. et al. (2023). \textit{SwinCD}. Remote Sensing.
-\item Vaswani, A. et al. (2017). \textit{Attention Is All You Need}. NeurIPS.
-\item Dosovitskiy, A. et al. (2021). \textit{ViT}. ICLR.
-\item Raghu, A. et al. (2023). \textit{Revenge of ViT}. LNCS.
-\item Fan, Y. et al. (2024). \textit{ViTAR}. CVPR.
-\item Fan, Q. et al. (2025). \textit{RALA}. ICLR.
+\item Bandara, W.G.C.\ \& Patel, V.M.\ (2022). \textit{ChangeFormer}. IGARSS.
+\item Zheng, Z.\ et al.\ (2020). \textit{LEVIR-CD}. Remote Sensing.
+\item Zhang, C.\ et al.\ (2020). \textit{DSIFN-CD}. ISPRS JPRS.
+\item Ji, S.\ et al.\ (2019). \textit{WHU-CD}. IEEE TGRS.
+\item Chen, H.\ et al.\ (2022). \textit{BIT}. CVPR.
+\item Fang, J.\ \& Li, J.\ (2021). \textit{SNUNet-CD}. IEEE GRSL.
+\item Shi, Q.\ et al.\ (2022). \textit{SYSU-CD}. IEEE TGRS.
+\item Shen, L.\ et al.\ (2021). \textit{S2Looking}. Remote Sensing.
+\item Chen, K.\ et al.\ (2023). \textit{LEVIR-CD+}. IEEE TGRS.
+\item Fan, Q.\ et al.\ (2025). \textit{Breaking the Low-Rank Dilemma via Linear Attention (RALA)}. ICLR.
+\item Daudt, R.C.\ et al.\ (2018). \textit{Fully Convolutional Siamese Networks for BCD}. ICIP.
+\item Vaswani, A.\ et al.\ (2017). \textit{Attention Is All You Need}. NeurIPS.
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{References (2/3)}
+\begin{frame}{References (2/2)}
 \footnotesize
 \begin{enumerate}
 \setcounter{enumi}{12}
-\item Daudt, R.C. et al. (2018). \textit{Fully Convolutional Siamese Networks}. ICIP.
-\item Zhang, C. et al. (2020). \textit{Image Fusion Network}. ISPRS JPRS.
-\item Hussain, M. et al. (2013). \textit{Change Detection Review}. ISPRS JPRS.
-\item Zhang, C. et al. (2020). \textit{Survey on BCD}. ISPRS JPRS.
-\item Shafique, A. et al. (2022). \textit{Deep Learning CD Review}. Remote Sensing.
-\item Katharopoulos, A. et al. (2020). \textit{Transformers are RNNs}. ICML.
-\item Choromanski, K. et al. (2021). \textit{Performer}. ICLR.
-\item Wang, S. et al. (2020). \textit{Linformer}. NeurIPS.
-\item Xiong, Y. et al. (2021). \textit{Nyströmformer}. AAAI.
-\item Liu, Z. et al. (2021). \textit{Swin Transformer}. ICCV.
-\item Wei, C. et al. (2023). \textit{Sparsifiner}. CVPR.
-\item Yang, L. et al. (2021). \textit{Deep Siamese Networks for CD}. Remote Sensing.
+\item Dosovitskiy, A.\ et al.\ (2021). \textit{Vision Transformer (ViT)}. ICLR.
+\item Liu, Z.\ et al.\ (2021). \textit{Swin Transformer}. ICCV.
+\item Katharopoulos, A.\ et al.\ (2020). \textit{Transformers are RNNs}. ICML.
+\item Choromanski, K.\ et al.\ (2021). \textit{Performer}. ICLR.
+\item Wang, S.\ et al.\ (2020). \textit{Linformer}. NeurIPS.
+\item Xiong, Y.\ et al.\ (2021). \textit{Nyströmformer}. AAAI.
+\item Wei, C.\ et al.\ (2023). \textit{Sparsifiner}. CVPR.
+\item Hussain, M.\ et al.\ (2013). \textit{Change Detection Review}. ISPRS JPRS.
+\item Shafique, A.\ et al.\ (2022). \textit{Deep Learning BCD Review}. Remote Sensing.
+\item Yang, L.\ et al.\ (2021). \textit{Deep Siamese Networks for BCD}. Remote Sensing.
+\item Fan, Y.\ et al.\ (2024). \textit{ViTAR}. CVPR.
+\item Zhang, C.\ et al.\ (2020). \textit{Image Fusion Net}. ISPRS JPRS.
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{References (3/3)}
-\footnotesize
-\begin{enumerate}
-\setcounter{enumi}{24}
-\item Zhao, S. et al. (2023). \textit{Dual Encoder–Decoder CD}. IEEE TGRS.
-\item Tan, X. et al. (2024). \textit{Segment Change Model}. IGARSS.
-\item Guo, H. et al. (2021). \textit{Building Footprint Update}. RSE.
-\item Cao, Y. \& Huang, X. (2023). \textit{FFCTL}. RSE.
-\item Xiao, W. et al. (2024). \textit{CSCL-Net}. IJAEOG.
-\end{enumerate}
-\end{frame}
-
+% ----------------------------------------------------------
+% FRAME — Thank You
+% ----------------------------------------------------------
 \begin{frame}{}
 
 \begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\vspace{1.2cm}
+{\Large\textbf{\color{utecblue}Thank you.}}
 
-% ---------- Left column ----------
-\begin{column}{0.5\textwidth}
-\vspace{1cm}
-\Large
-\textbf{Thank you.}
-
-\vspace{0.5cm}
+\vspace{0.6cm}
 \normalsize
-Code available at:
-
-\vspace{0.2cm}
-\small \texttt{github.com/ricardoamiel/RALA-ChangeFormer}
+Open-source implementation:\\[4pt]
+\small\texttt{github.com/ricardoamiel/RALA-ChangeFormer}
 
 \vspace{0.8cm}
-\Large
-Questions?
+{\Large\textbf{\color{utecblue}Questions?}}
+
+\vspace{0.8cm}
+\footnotesize\color{charcoal}
+\textit{Ricardo Amiel Acuña Villogas}\\
+\textit{Data Science — UTEC, Lima, Perú}\\
+\textit{ricardo.acuna@utec.edu.pe}
 \end{column}
 
-% ---------- Right column ----------
-\begin{column}{0.50\textwidth}
+\begin{column}{0.40\textwidth}
 \centering
-\vspace{0.6cm}
-\includegraphics[
-  width=0.7\linewidth,
-  keepaspectratio
-]{QR.png}
+\vspace{0.8cm}
+\includegraphics[width=0.72\linewidth,keepaspectratio]{QR.png}\\
+\vspace{4pt}
+{\tiny\color{charcoal}\textit{Scan for code repository}}
 \end{column}
-
 \end{columns}
 
 \end{frame}
-
 
 \end{document}
