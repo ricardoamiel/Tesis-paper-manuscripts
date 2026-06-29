@@ -371,7 +371,7 @@ Y_i = \phi(X_i)\odot\bigl(\kappa(Q_i)\,B\bigr)
 \hline
 \hline
 \multirow{2}{*}{\textbf{WHU-CD}}    & ChangeFormer & 0.8912 & 0.8653 & 0.7629 & 99.18 \\ \cline{2-6}
-                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.8874} & \cellcolor{pastelorange}\textbf{0.8687} & \cellcolor{pastelorange}\textbf{76.80} & \cellcolor{pastelorange}\textbf{99.21} \\
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.8874} & \cellcolor{pastelorange}\textbf{0.8687} & \cellcolor{pastelorange}\textbf{0.7680} & \cellcolor{pastelorange}\textbf{99.21} \\
 \hline
 \hline
 \multirow{2}{*}{\textbf{LEVIR-CD+}} & ChangeFormer & 0.9088 & 0.8927 & 0.8067 & 99.12 \\ \cline{2-6}
@@ -382,8 +382,8 @@ Y_i = \phi(X_i)\odot\bigl(\kappa(Q_i)\,B\bigr)
                            & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.7798} & \cellcolor{pastelorange}\textbf{0.7814} & \cellcolor{pastelorange}\textbf{0.6414} & \cellcolor{pastelorange}\textbf{89.91} \\
 \hline
 \hline
-\multirow{2}{*}{\textbf{S2Looking}} & ChangeFormer & 0.6783 & 0.6555 & 48.76 & 96.58 \\ \cline{2-6}
-                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.6697} & \cellcolor{pastelorange}\textbf{0.6591} & \cellcolor{pastelorange}\textbf{49.16} & \cellcolor{pastelorange}\textbf{96.63} \\
+\multirow{2}{*}{\textbf{S2Looking}} & ChangeFormer & 0.6783 & 0.6555 & 0.4876 & 96.58 \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.6697} & \cellcolor{pastelorange}\textbf{0.6591} & \cellcolor{pastelorange}\textbf{0.4916} & \cellcolor{pastelorange}\textbf{96.63} \\
 \hline
 \end{tabular}
 
@@ -411,10 +411,10 @@ SNUNet-CD   & 12.04 &  14.86 &  5.67 \\
 \hline
 BIT         & 11.05 &  17.22 &  5.13 \\
 \hline
-ChangeFormer & 41.02 & 202.17 & 13.28 \\
+ChangeFormer & 247 & 248.77 & 27 \\
 \hline
 \rowcolor{pastelorange}
-\textbf{Ours (RALA-CF)} & \textbf{41.08} & \textbf{185.93} & \textbf{10.38} \\
+\textbf{Ours (RALA-CF)} & \textbf{243} & \textbf{228.62} & \textbf{21} \\
 \hline
 \end{tabular}
 }
@@ -562,7 +562,7 @@ This analytical boundary confirms that RALA-CF achieves maximum efficiency witho
   \item Map quadratic encoder limits down to strict linear complexity bounds: $\mathcal{O}(N_l^2d) \to \mathcal{O}(N_ld^2)$.
   \item Mitigate low-rank collapse paths via Hadamard product output token modulation $\phi(\cdot)$.
   \item Retain structural accuracy parity across the comprehensive 6-dataset evaluation matrix ($\Delta = +0.14$\,pp mean F1).
-  \item Achieve a 21.8\% VRAM saving, 8\% GFLOPs mitigation, and an exact uniform 50\% training batch size expansion.
+  \item Achieve a 22.2\% VRAM saving, 8\% GFLOPs mitigation, and an exact uniform 50\% training batch size expansion.
 \end{itemize}
 \end{column}
 
