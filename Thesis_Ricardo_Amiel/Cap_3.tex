@@ -247,12 +247,8 @@ methods can be broadly categorized into three families: kernel-based linear
 approximations, low-rank matrix factorizations, and sparse or window-restricted
 attention variants.
 
-The kernel-based approach reformulates the softmax attention kernel
-$\exp(q^\top k / \sqrt{d})$---following the structural linear attention
-formulation introduced by \cite{Katharopoulos2020Linear}---as the inner
-product of two positive feature map vectors $\kappa(q)^\top \kappa(k)$,
-where $\kappa: \mathbb{R}^d \to \mathbb{R}^{d'}$ is a fixed or learned
-transformation. This substitution enables the key-value product
+
+The kernel-based approach reformulates the softmax attention kernel $\exp(q^\top k / \sqrt{d})$. Following the structural linear attention formulation originally, who is introduced by \cite{Katharopoulos2020Linear}, this kernel is mapped as the inner product of two positive feature map vectors $\kappa(q)^\top \kappa(k)$, where $\kappa: \mathbb{R}^d \to \mathbb{R}^{d'}$ represents a fixed or learned transformation. This substitution enables the key-value product
 $\kappa(K)^\top V$ to be precomputed as a global $d' \times d$ buffer,
 reducing the per-query output computation to a single matrix-vector product
 and bringing total attention complexity down to $\mathcal{O}(N {d'}^2)$,
@@ -432,9 +428,8 @@ attention mechanism: the former requires invariance to apparent positional
 shifts, the second requires semantic selectivity, and the third requires the
 preservation of fine-grained spatial detail that rank collapse would suppress.
 
-The experimental program of this thesis closes this gap by subjecting
-RALA-ChangeFormer to a six-dataset evaluation matrix spanning the full
-range of acquisition conditions described above. This matrix pairs the
+
+The experimental program of this thesis closes this gap by subjecting the proposed RALA-ChangeFormer\allowbreak\ evaluation matrix spanning the full range of acquisition conditions described above. This matrix pairs the
 foundational benchmarks---LEVIR-CD and DSIFN-CD---with four extended
 datasets: WHU-CD, LEVIR-CD+, SYSU-CD, and S2Looking. Together they provide
 a comprehensive empirical characterization of the accuracy-efficiency
@@ -452,55 +447,33 @@ situating the proposed RALA-ChangeFormer within the broader methodological
 landscape and making explicit the low-rank collapse exposure that
 distinguishes each approach.
 
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering
 {\footnotesize
-\caption{Comparative overview of building change detection paradigms.
-Supervision level, backbone type, attention mechanism, and theoretical
-exposure to low-rank key-value collapse are assessed across representative
-architectures. RALA-ChangeFormer is the method proposed in this thesis.}
+\caption{Comparative overview of building change detection paradigms. Supervision level, backbone type, attention mechanism, and theoretical exposure to low-rank key-value collapse are assessed across representative architectures. RALA-ChangeFormer is the method proposed in this thesis.}
 \label{tab:bcd_paradigms}
-\begin{tabularx}{\textwidth}{p{1.5cm} X X p{1.5cm} X p{1.7cm}}
+% Se aumentó a 2.0cm la primera columna y se aplica \raggedright elástico a las pesadas
+\begin{tabularx}{\textwidth}{p{2.0cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X p{1.6cm} >{\raggedright\arraybackslash}X p{1.7cm}}
 \hline
-\textbf{Paradigm} & \textbf{Method} & \textbf{Backbone} &
-\textbf{Supervision} & \textbf{Attention mechanism} &
-\textbf{Low-rank risk} \\
+\textbf{Paradigm} & \textbf{Method} & \textbf{Backbone} & \textbf{Supervision} & \textbf{Attention Mechanism} & \textbf{Low-Rank Risk} \\
 \hline
-\multicolumn{6}{l}{\textit{Supervised --- convolutional Siamese}} \\[2pt]
-Supervised & FC-EF \cite{Daudt2018SiamICIP}
-    & VGG-style encoder
-    & Full labels & None & Not applicable \\
-Supervised & SNUNet-CD \cite{Fang2021SNUNetCD}
-    & NestedUNet
-    & Full labels & Channel attention & Minimal \\
-Supervised & DSIFN \cite{Zhang2020FusionNetDSIFN}
-    & VGG encoder
-    & Full labels & Channel attention & Minimal \\
+\multicolumn{6}{l}{\textit{Supervised --- Convolutional Siamese}} \\[2pt]
+Supervised & FC-EF \cite{Daudt2018SiamICIP} & VGG-style encoder & Full labels & None & Not applicable \\
+Supervised & SNUNet-CD \cite{Fang2021SNUNetCD} & NestedUNet & Full labels & Channel attention & Minimal \\
+Supervised & DSIFN \cite{Zhang2020FusionNetDSIFN} & VGG encoder & Full labels & Channel attention & Minimal \\
 \hline
 \multicolumn{6}{l}{\textit{Supervised --- Transformer-based}} \\[2pt]
-Supervised & BIT \cite{Chen2022BIT}
-    & ResNet-18 + token encoder
-    & Full labels & Cross-temporal MHSA & Moderate \\
-Supervised & ChangeFormer \cite{Bandara2022ChangeFormer}
-    & SegFormer-B2
-    & Full labels & Full MHSA ($\mathcal{O}(N^2)$) & High \\
-Supervised & \textbf{RALA-ChangeFormer} \cite{Fan2025RALA}
-    & SegFormer-B2 + RALA
-    & Full labels & Rank-augmented linear ($\mathcal{O}(Nd)$)
-    & \textbf{Eliminated} \\
+Supervised & BIT \cite{Chen2022BIT} & ResNet-18 + token encoder & Full labels & Cross-temporal MHSA & Moderate \\
+Supervised & ChangeFormer \cite{Bandara2022ChangeFormer} & SegFormer-B2 & Full labels & Full MHSA ($\mathcal{O}(N^2)$) & High \\
+\rowcolor{pastelorange}
+Supervised & \textbf{RALA-ChangeFormer} \cite{Fan2025RALA} & SegFormer-B2 + RALA & Full labels & Rank-augmented linear ($\mathcal{O}(Nd)$) & \textbf{Eliminated} \\
 \hline
 \multicolumn{6}{l}{\textit{Unsupervised}} \\[2pt]
-Unsupervised & SCM \cite{Zhao2023SCM}
-    & SAM-based
-    & No labels & Foundation-model prompt & Not applicable \\
+Unsupervised & SCM \cite{Zhao2023SCM} & SAM-based & No labels & Foundation-model prompt & Not applicable \\
 \hline
 \multicolumn{6}{l}{\textit{Self-supervised pre-training}} \\[2pt]
-Self-supervised & SatMAE \cite{Cong2022SatMAE}
-    & ViT masked autoencoder
-    & Unlabelled VHR imagery & Standard MHSA (pre-training) & High (pre-train) \\
-Self-supervised & SSLChange \cite{Zhao2024SSLChange}
-    & CNN + domain adaptation
-    & Domain-shift labels & None & Low \\
+Self-supervised & SatMAE \cite{Cong2022SatMAE} & ViT masked autoencoder & Unlabelled VHR imagery & Standard MHSA (pre-training) & High (pre-train) \\
+Self-supervised & SSLChange \cite{Zhao2024SSLChange} & CNN + domain adaptation & Domain-shift labels & None & Low \\
 \hline
 \end{tabularx}
 }% end \footnotesize

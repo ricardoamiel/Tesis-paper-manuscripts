@@ -411,10 +411,11 @@ inputs.
 
 A principled approach to reducing the quadratic cost of softmax attention is to
 replace the softmax kernel with a positive-definite feature map
-$\kappa: \mathbb{R}^d \to \mathbb{R}^{d'}$, such that
-$\kappa(q)^\top \kappa(k) \approx \exp(q^\top k / \sqrt{d})$ for all
-$q, k \in \mathbb{R}^d$. This substitution, introduced by
-\cite{Katharopoulos2020Linear}, yields the \emph{linear attention} formulation:
+$\kappa: \mathbb{R}^d \to \mathbb{R}^{d'}$, such that 
+$\kappa(q)^\top \kappa(k) \approx \exp(q^\top k / \sqrt{d})$ for all vectors
+$q, k \in \mathbb{R}^d$. As originally introduced in the definitive framework of
+\cite{Katharopoulos2020Linear}, this strategic substitution yields the 
+standardized \emph{linear attention} formulation:
 \begin{equation}
 \mathrm{Attn}_{\mathrm{lin}}(Q, K, V)
     = \kappa(Q)\,\bigl(\kappa(K)^\top V\bigr),

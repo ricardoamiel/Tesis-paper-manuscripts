@@ -272,11 +272,7 @@ Y^{(l)} = \mathrm{FFN}\!\bigl(X_{\mathrm{out}}^{(l)}\bigr),
 \label{eq:residual_ffn}
 \end{equation}
 where $\mathrm{LN}(\cdot)$ is layer normalization and $\mathrm{FFN}(\cdot)$
-is a two-layer feed-forward network with GELU activation. In the baseline
-ChangeFormer, $A^{(l)} = \mathrm{MHSA}(X^{(l)})$; in RALA-ChangeFormer,
-$A^{(l)} = \mathrm{RALA}(X^{(l)})$. Every other component of the block---
-the normalization, FFN, skip connection, and downstream fusion---is shared
-identically between the two variants.
+is a two-layer feed-forward network with GELU activation. In the baseline ChangeFormer configuration, $A^{(l)} = \mathrm{MHSA}(X^{(l)})$; conversely, inside the proposed \ac{RALA-CF} network, $A^{(l)} = \mathrm{RALA}(X^{(l)})$. Every other component of the block: the normalization, FFN, skip connection, and downstream fusion is shared identically between the two variants.
 
 \begin{figure}[h!]
     \centering
@@ -517,10 +513,7 @@ assessment workflows.
 \label{sec:final-considerations}
 % =============================================================================
 
-This chapter has presented the complete design of RALA-ChangeFormer: a
-hierarchical Siamese Transformer architecture for bi-temporal building change
-detection in which the quadratic self-attention bottleneck of the baseline
-ChangeFormer \cite{Bandara2022ChangeFormer} has been systematically replaced
+This chapter has presented the complete design of RALA-ChangeFormer: a hierarchical Siamese Transformer architecture for bi-temporal building change detection. Within this framework, the quadratic self-attention bottleneck originally identified in the baseline ChangeFormer model by \cite{Bandara2022ChangeFormer} has been systematically replaced
 by the rank-augmented linear attention mechanism of \cite{Fan2025RALA} at
 every encoder stage. The presentation has proceeded from the formal problem
 specification through the preprocessing protocol, the architectural design and

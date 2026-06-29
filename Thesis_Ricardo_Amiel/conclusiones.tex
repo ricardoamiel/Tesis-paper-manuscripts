@@ -141,16 +141,8 @@ multi-class setting, or dataset-specific fine-tuning that explicitly targets the
 SYSU-CD annotation taxonomy. In all these cases, the limitation is a property
 of the learning objective design rather than of the attention architecture.
 
-A third category of limitation relates to the encoding capacity of the shared
-convolutional-Transformer backbone. As documented in the parameter and FLOPs
-analysis of Table~\ref{tab:efficiency}, both ChangeFormer and RALA-ChangeFormer
-operate at 41~M parameters, a fixed capacity determined by the SegFormer-B2
-backbone design. This capacity ceiling bounds the upper F1 that either model can
-achieve across all six datasets, and the performance gradient observed between
-the two architectures---ranging from $+0.13$ F1 points on LEVIR-CD to
-$+0.36$ on S2Looking---reflects the degree to which the rank augmentation
-provides an attention-level representational advantage over the uniform linear
-baseline within the shared backbone capacity. When the backbone itself is the
+
+A third category of limitation relates to the encoding capacity of the shared backbone, which integrates convolutional and Transformer layers. As documented in the parameter and FLOPs analysis of Table~\ref{tab:efficiency}, both ChangeFormer and RALA-ChangeFormer operate at 41~M parameters, a fixed capacity determined by the SegFormer-B2 backbone design. This capacity ceiling bounds the upper F1 that either model can achieve across all six datasets, and the performance gradient observed between the two architectures---ranging from $+0.13$ F1 points on LEVIR-CD to $+0.36$ on S2Looking---reflects the degree to which the rank augmentation provides an attention-level representational advantage over the uniform linear baseline within the shared backbone capacity. When the backbone itself is the
 binding constraint---as on S2Looking, where the geometric normalization of the
 input data is the operative limitation---further improvements to the attention
 mechanism can yield only marginal gains. This observation implies that
@@ -247,9 +239,7 @@ evaluation benchmarks representative of the informal urban growth patterns,
 mixed-use land parcel structures, and irregular building topologies that
 characterize the metropolitan areas of Latin America, Sub-Saharan Africa, and
 South and Southeast Asia---regions that are simultaneously among the most
-rapidly urbanizing on Earth and the most underserved by operational BCD systems.
-
-The six benchmark datasets used in this thesis share a common acquisition profile
+rapidly urbanizing on Earth and the most underserved by operational BCD systems. The six benchmark datasets used in this thesis share a common acquisition profile
 that reflects the research priorities of communities with access to large-scale
 VHR archives and annotation capacity: near-nadir viewing geometry, binary or
 categorically simple change labels, predominantly planned or semi-planned urban
@@ -303,10 +293,4 @@ extending the operational reach of the RALA-ChangeFormer framework to
 environments where neither A100 GPU clusters nor constant connectivity can be
 assumed.
 
-The convergence of these technical and geographic research directions points
-toward a research programme of sustained ambition: the construction of
-computationally accessible, geographically representative, and operationally
-deployable deep learning systems for bi-temporal urban change monitoring across
-the full morphological diversity of the Global South. This thesis establishes
-the efficient attention mechanism foundations on which such a programme can be
-built.
+The convergence of these technical and geographic research directions points toward a research programme of sustained ambition: the construction of computationally accessible, geographically representative, and operationally deployable deep learning systems for bi-temporal urban change monitoring across the full morphological diversity of the Global South. This thesis establishes the efficient attention mechanism foundations on which such a programme can be built.
