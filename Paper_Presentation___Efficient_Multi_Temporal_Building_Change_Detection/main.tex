@@ -337,18 +337,18 @@ Y_i = \phi(X_i)\odot\bigl(\kappa(Q_i)\,B\bigr)
 \textbf{Target Benchmark} & \textbf{Architecture Baseline} & \textbf{Precision} & \textbf{$F_1$-Score} & \textbf{IoU} & \textbf{OA (\%)} \\
 \hline
 \hline
-\multirow{5}{*}{\textbf{LEVIR-CD}} & FC-EF & 86.91 & 83.40 & 71.53 & 98.75 \\ \cline{2-6}
-                          & SNUNet-CD & 88.16 & 86.88 & 76.83 & 98.97 \\ \cline{2-6}
-                          & BIT & 89.24 & 89.31 & 80.68 & 99.11 \\ \cline{2-6}
-                          & ChangeFormer & 92.05 & 90.40 & 82.48 & 99.19 \\ \cline{2-6}
-                          & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{91.83} & \cellcolor{pastelorange}\textbf{90.53} & \cellcolor{pastelorange}\textbf{82.71} & \cellcolor{pastelorange}\textbf{99.21} \\
+\multirow{5}{*}{\textbf{LEVIR-CD}} & FC-EF & 86.91 & 83.40 & 71.53 & 98.39 \\ \cline{2-6}
+                          & SNUNet-CD & 89.18 & 88.16 & 78.83 & 98.82 \\ \cline{2-6}
+                          & BIT & 89.24 & 89.31 & 80.68 & 98.93 \\ \cline{2-6}
+                          & ChangeFormer & \textbf{92.05} & \textbf{90.40} & \textbf{82.48} & \textbf{99.04} \\ \cline{2-6}
+                          & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange} 90.08 & \cellcolor{pastelorange} 89.67 & \cellcolor{pastelorange} 81.60 & \cellcolor{pastelorange} 98.99 \\
 \hline
 \hline
-\multirow{5}{*}{\textbf{DSIFN-CD}} & FC-EF & 56.18 & 60.55 & 43.41 & 86.38 \\ \cline{2-6}
-                          & SNUNet-CD & 61.32 & 66.28 & 49.58 & 88.54 \\ \cline{2-6}
-                          & BIT & 68.36 & 69.56 & 53.32 & 89.07 \\ \cline{2-6}
-                          & ChangeFormer & 76.44 & 74.45 & 59.31 & 90.33 \\ \cline{2-6}
-                          & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{75.91} & \cellcolor{pastelorange}\textbf{74.88} & \cellcolor{pastelorange}\textbf{59.85} & \cellcolor{pastelorange}\textbf{90.41} \\
+\multirow{5}{*}{\textbf{DSIFN-CD}} & FC-EF & 72.61 & 61.09 & 43.98 & 88.59 \\ \cline{2-6}
+                          & SNUNet-CD & 60.60 & 66.18 & 49.45 & 87.34 \\ \cline{2-6}
+                          & BIT & 68.36 & 69.26 & 52.97 & 89.41 \\ \cline{2-6}
+                          & ChangeFormer & \textbf{88.48} & \textbf{86.67} & \textbf{76.48} & \textbf{95.56} \\ \cline{2-6}
+                          & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange} 84.97 & \cellcolor{pastelorange} 84.07 & \cellcolor{pastelorange} 73.96 & \cellcolor{pastelorange} 92.44 \\
 \hline
 \end{tabular}
 
@@ -370,20 +370,20 @@ Y_i = \phi(X_i)\odot\bigl(\kappa(Q_i)\,B\bigr)
 \textbf{Target Benchmark} & \textbf{Architecture Baseline} & \textbf{Precision} & \textbf{$F_1$-Score} & \textbf{IoU} & \textbf{OA (\%)} \\
 \hline
 \hline
-\multirow{2}{*}{\textbf{WHU-CD}}    & ChangeFormer & 0.8912 & 0.8653 & 0.7629 & 99.18 \\ \cline{2-6}
-                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.8874} & \cellcolor{pastelorange}\textbf{0.8687} & \cellcolor{pastelorange}\textbf{0.7680} & \cellcolor{pastelorange}\textbf{99.21} \\
+\multirow{2}{*}{\textbf{WHU-CD}}    & ChangeFormer & 84.87 & 87.45 & 77.70 & \textbf{99.11} \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{90.14} & \cellcolor{pastelorange}\textbf{87.85} & \cellcolor{pastelorange}\textbf{78.33} & \cellcolor{pastelorange} 99.05 \\
 \hline
 \hline
-\multirow{2}{*}{\textbf{LEVIR-CD+}} & ChangeFormer & 0.9088 & 0.8927 & 0.8067 & 99.12 \\ \cline{2-6}
-                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.9061} & \cellcolor{pastelorange}\textbf{0.8939} & \cellcolor{pastelorange}\textbf{0.8085} & \cellcolor{pastelorange}\textbf{99.14} \\
+\multirow{2}{*}{\textbf{LEVIR-CD+}} & ChangeFormer & 79.97 & \textbf{80.65} & \textbf{67.58} & \textbf{98.44} \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{80.20} & \cellcolor{pastelorange} 80.24 & \cellcolor{pastelorange} 67.01 & \cellcolor{pastelorange} 98.39 \\
 \hline
 \hline
-\multirow{2}{*}{\textbf{SYSU-CD}}   & ChangeFormer & 0.7862 & 0.7787 & 0.6378 & 89.83 \\ \cline{2-6}
-                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.7798} & \cellcolor{pastelorange}\textbf{0.7814} & \cellcolor{pastelorange}\textbf{0.6414} & \cellcolor{pastelorange}\textbf{89.91} \\
+\multirow{2}{*}{\textbf{SYSU-CD}}   & ChangeFormer & 77.90 & 78.81 & \textbf{65.03} & \textbf{90.12} \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{82.10} & \cellcolor{pastelorange}\textbf{78.02} & \cellcolor{pastelorange} 63.97 & \cellcolor{pastelorange}\textbf{90.12} \\
 \hline
 \hline
-\multirow{2}{*}{\textbf{S2Looking}} & ChangeFormer & 0.6783 & 0.6555 & 0.4876 & 96.58 \\ \cline{2-6}
-                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange}\textbf{0.6697} & \cellcolor{pastelorange}\textbf{0.6591} & \cellcolor{pastelorange}\textbf{0.4916} & \cellcolor{pastelorange}\textbf{96.63} \\
+\multirow{2}{*}{\textbf{S2Looking}} & ChangeFormer & \textbf{72.14} & \textbf{61.89} & \textbf{45.77} & 84.55 \\ \cline{2-6}
+                           & \textbf{Ours (RALA-CF)} & \cellcolor{pastelorange} 70.02 & \cellcolor{pastelorange} 60.39 & \cellcolor{pastelorange} 43.25 & \cellcolor{pastelorange}\textbf{99.16} \\
 \hline
 \end{tabular}
 
